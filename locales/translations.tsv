@@ -1,0 +1,481 @@
+简体中文	繁體中文	English	日本語
+Git 文档	Git 文件	Git Documentation	Git ドキュメント
+HEAD 分离于 {id}	HEAD 分離於 {id}	HEAD detached at {id}	HEAD は {id} で切り離されています
+HEAD（{head_text}）	HEAD（{head_text}）	HEAD ({head_text})	HEAD（{head_text}）
+git 退出状态 {status}	git 結束狀態 {status}	git exited with {status}	git の終了ステータス {status}
+git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: auto-stash before checkout	git-forker: 切り替え前の自動スタッシュ
+{branch}\n跟踪 {upstream}	{branch}\n追蹤 {upstream}	{branch}\nTracking {upstream}	{branch}\n{upstream} を追跡
+{context_lines} 行	{context_lines} 行	{context_lines} lines	{context_lines} 行
+{count} 个冲突文件	{count} 個衝突檔案	{count} conflicted files	{count} 個の競合ファイル
+{count} 个匹配的提交	{count} 個符合的提交	{count} matching commits	{count} 件の一致するコミット
+{count} 个文件	{count} 個檔案	{count} files	{count} 個のファイル
+{count} 个文件已更改	{count} 個檔案已變更	{count} files changed	{count} 個のファイルを変更
+{path}：{err}	{path}：{err}	{path}: {err}	{path}：{err}
+{title}失败：{summary}	{title}失敗：{summary}	{title} failed: {summary}	{title}に失敗しました：{summary}
+{title}完成	{title}完成	{title} finished	{title}が完了しました
+{title}：{line}	{title}：{line}	{title}: {line}	{title}：{line}
+── {title}：{result}	── {title}：{result}	── {title}: {result}	── {title}：{result}
+上级目录	上層目錄	Parent folder	親フォルダ
+丢弃	捨棄	Discard	破棄
+丢弃所有本地更改	捨棄所有本機變更	Discard all local changes	すべてのローカル変更を破棄
+中止	中止	Abort	中止
+主线父提交	主線父提交	Mainline parent	メインラインの親
+二进制文件，{size} 字节	二進位檔案，{size} 位元組	Binary file, {size} bytes	バイナリファイル、{size} バイト
+二进制文件，无法显示文本差异	二進位檔案，無法顯示文字差異	Binary file, no text diff available	バイナリファイルのためテキスト差分を表示できません
+今天 %H:%M	今天 %H:%M	Today at %H:%M	今日 %H:%M
+从 {remote}/{branch} 拉取	從 {remote}/{branch} 拉取	Pull from {remote}/{branch}	{remote}/{branch} からプル
+从列表中移除	從清單中移除	Remove from List	リストから削除
+从所选提交开始二分查找（标记为坏）	從所選提交開始二分搜尋（標記為壞）	Start bisect from selected commit (mark bad)	選択したコミットから二分探索を開始（bad としてマーク）
+从此创建分支…	從此建立分支…	Create Branch from Here…	ここからブランチを作成…
+从远程仓库删除…	從遠端儲存庫刪除…	Delete from Remote…	リモートから削除…
+仓库	儲存庫	Repository	リポジトリ
+仓库地址	儲存庫位址	Repository URL	リポジトリ URL
+仓库没有工作目录	儲存庫沒有工作目錄	The repository has no working directory	リポジトリに作業ディレクトリがありません
+仓库管理器	儲存庫管理器	Repository Manager	リポジトリマネージャー
+仓库设置…	儲存庫設定…	Repository Settings…	リポジトリ設定…
+仓库选项	儲存庫選項	Repository Options	リポジトリオプション
+位于分支 {name}	位於分支 {name}	On branch {name}	ブランチ {name}
+位置: {target_label}	位置: {target_label}	At: {target_label}	位置: {target_label}
+作者	作者	Author	作成者
+使用对方版本	使用對方版本	Use Theirs	相手側を使用
+使用对方版本 (theirs)	使用對方版本 (theirs)	Use Theirs (theirs)	相手側を使用 (theirs)
+使用我方版本	使用我方版本	Use Ours	自分側を使用
+使用我方版本 (ours)	使用我方版本 (ours)	Use Ours (ours)	自分側を使用 (ours)
+保存	儲存	Save	保存
+保留工作区和暂存区	保留工作區和暫存區	Keep working tree and index	作業ツリーとインデックスを保持
+保留工作区，清空暂存区	保留工作區，清空暫存區	Keep working tree, reset index	作業ツリーを保持し、インデックスをリセット
+保留（与目标冲突时 Git 会拒绝）	保留（與目標衝突時 Git 會拒絕）	Keep (Git refuses if they conflict)	保持（競合する場合 Git は拒否します）
+修改	修改	Modified	変更
+修改上次提交	修改上次提交	Amend last commit	直前のコミットを修正
+修改提交	修改提交	Amend	修正
+修改提交说明	修改提交說明	Edit Commit Message	コミットメッセージを編集
+修改提交说明…	修改提交說明…	Edit Commit Message…	コミットメッセージを編集…
+克隆	複製	Clone	クローン
+克隆 {url}	複製 {url}	Clone {url}	{url} をクローン
+克隆…	複製…	Clone…	クローン…
+克隆仓库	複製儲存庫	Clone Repository	リポジトリをクローン
+克隆失败：{reason}	複製失敗：{reason}	Clone failed: {reason}	クローンに失敗しました：{reason}
+克隆完成	複製完成	Clone finished	クローンが完了しました
+克隆远程仓库…	複製遠端儲存庫…	Clone Remote Repository…	リモートリポジトリをクローン…
+全选	全選	Select All	すべてを選択
+全部取消暂存	全部取消暫存	Unstage All	すべてアンステージ
+全部提交	全部提交	All Commits	すべてのコミット
+全部显示	全部顯示	Show All	すべてを表示
+全部暂存	全部暫存	Stage All	すべてステージ
+关于 git-forker	關於 git-forker	About git-forker	git-forker について
+关闭	關閉	Close	閉じる
+关闭标签页	關閉分頁	Close Tab	タブを閉じる
+冲突	衝突	Conflicted	競合
+减少上下文行	減少上下文行	Fewer Context Lines	コンテキスト行を減らす
+分支	分支	Branches	ブランチ
+分支 {branch} 已存在	分支 {branch} 已存在	Branch {branch} already exists	ブランチ {branch} は既に存在します
+分支名	分支名稱	Branch name	ブランチ名
+分支和引用	分支和參照	Branches and References	ブランチと参照
+分离于 {id}	分離於 {id}	Detached at {id}	{id} で切り離し
+切换全屏	切換全螢幕	Toggle Full Screen	フルスクリーンを切り替え
+创建	建立	Create	作成
+创建分支	建立分支	Create Branch	ブランチを作成
+创建分支 {name}	建立分支 {name}	Create branch {name}	ブランチ {name} を作成
+创建分支…	建立分支…	Create Branch…	ブランチを作成…
+创建后检出	建立後切換	Check out after creating	作成後にチェックアウト
+创建并检出分支 {name}	建立並切換分支 {name}	Create and check out branch {name}	ブランチ {name} を作成してチェックアウト
+创建标签	建立標籤	Create Tag	タグを作成
+创建标签 {name}	建立標籤 {name}	Create tag {name}	タグ {name} を作成
+创建标签…	建立標籤…	Create Tag…	タグを作成…
+删除	刪除	Delete	削除
+删除…	刪除…	Delete…	削除…
+删除分支	刪除分支	Delete Branch	ブランチを削除
+删除分支 {name}	刪除分支 {name}	Delete branch {name}	ブランチ {name} を削除
+删除标签	刪除標籤	Delete Tag	タグを削除
+删除标签 {name}	刪除標籤 {name}	Delete tag {name}	タグ {name} を削除
+删除贮藏	刪除儲藏	Delete Stash	スタッシュを削除
+删除贮藏 {stash}	刪除儲藏 {stash}	Delete stash {stash}	スタッシュ {stash} を削除
+删除远程仓库	刪除遠端儲存庫	Delete Remote	リモートを削除
+删除远程仓库 {name}	刪除遠端儲存庫 {name}	Delete remote {name}	リモート {name} を削除
+删除远程分支	刪除遠端分支	Delete Remote Branch	リモートブランチを削除
+删除远程分支 {name}	刪除遠端分支 {name}	Delete remote branch {name}	リモートブランチ {name} を削除
+删除远程已不存在的分支 (--prune)	刪除遠端已不存在的分支 (--prune)	Prune branches deleted on the remote (--prune)	リモートで削除されたブランチを整理 (--prune)
+刷新	重新整理	Refresh	更新
+前置全部窗口	將所有視窗移至最前	Bring All to Front	すべてを手前に移動
+剪切	剪下	Cut	カット
+包含未跟踪的新文件	包含未追蹤的新檔案	Include untracked files	未追跡のファイルを含める
+即使未合并也删除 (-D)	即使未合併也刪除 (-D)	Delete even if not merged (-D)	マージされていなくても削除 (-D)
+压缩为一次更改 (--squash)	壓縮為一次變更 (--squash)	Squash into one change (--squash)	1 つの変更にまとめる (--squash)
+原名称: {old}	原名稱: {old}	Current name: {old}	元の名前: {old}
+双击在新标签页中打开	按兩下在新分頁中開啟	Double-click to open in a new tab	ダブルクリックで新しいタブで開く
+取消	取消	Cancel	キャンセル
+取消暂存	取消暫存	Unstage	アンステージ
+取消暂存区块	取消暫存區塊	Unstage Hunk	ハンクをアンステージ
+取消暂存所选行	取消暫存所選行	Unstage Selected Lines	選択行をアンステージ
+取消暂存文件	取消暫存檔案	Unstage File	ファイルをアンステージ
+取消跟踪上游	取消追蹤上游	Unset Upstream	アップストリームの追跡を解除
+变基	重定基底	Rebase	リベース
+变基到 {onto}	重定基底到 {onto}	Rebase onto {onto}	{onto} にリベース
+只修改最新提交的说明，暂存区的更改不会加入。	只修改最新提交的說明，暫存區的變更不會加入。	Only the latest commit's message changes; staged changes are not included.	最新コミットのメッセージのみ変更します。ステージ済みの変更は含まれません。
+只允许快进 (--ff-only)	只允許快轉 (--ff-only)	Fast-forward only (--ff-only)	早送りのみ (--ff-only)
+只显示当前分支	只顯示目前分支	Show Current Branch Only	現在のブランチのみ表示
+只沿第一父提交	只沿第一父提交	First Parent Only	最初の親のみ
+合并	合併	Merge	マージ
+合并 {branch}	合併 {branch}	Merge {branch}	{branch} をマージ
+合并到 {current}…	合併到 {current}…	Merge into {current}…	{current} にマージ…
+合并工具	合併工具	Merge Tool	マージツール
+合并工具 {path}	合併工具 {path}	Merge tool {path}	マージツール {path}
+同时从远程仓库删除	同時從遠端儲存庫刪除	Also delete from remote	リモートからも削除
+同时删除远程分支 {upstream}	同時刪除遠端分支 {upstream}	Also delete remote branch {upstream}	リモートブランチ {upstream} も削除
+同时推送所有标签	同時推送所有標籤	Push all tags	すべてのタグをプッシュ
+同时更新指向被改写提交的分支 (--update-refs)	同時更新指向被改寫提交的分支 (--update-refs)	Update branches pointing to rewritten commits (--update-refs)	書き換えたコミットを指すブランチも更新 (--update-refs)
+同时重命名远程分支 {upstream}	同時重新命名遠端分支 {upstream}	Also rename remote branch {upstream}	リモートブランチ {upstream} の名前も変更
+名称	名稱	Name	名前
+名称不能为空	名稱不能為空	Name cannot be empty	名前を入力してください
+名称包含 Git 不允许的字符	名稱包含 Git 不允許的字元	Name contains characters Git does not allow	名前に Git で使えない文字が含まれています
+名称没有变化	名稱沒有變化	Name is unchanged	名前が変わっていません
+在已加载的提交中搜索	在已載入的提交中搜尋	Searches loaded commits	読み込み済みのコミットを検索
+在文件管理器中显示	在檔案管理器中顯示	Show in File Manager	ファイルマネージャで表示
+在此创建分支…	在此建立分支…	Create Branch Here…	ここにブランチを作成…
+在此创建标签…	在此建立標籤…	Create Tag Here…	ここにタグを作成…
+在终端中打开	在終端機中開啟	Open in Terminal	ターミナルで開く
+在访达中显示	在 Finder 中顯示	Show in Finder	Finder で表示
+在说明里附加原提交 SHA (-x)	在說明中附加原提交 SHA (-x)	Append original commit SHA to message (-x)	メッセージに元のコミット SHA を追記 (-x)
+地址	位址	URL	URL
+增加上下文行	增加上下文行	More Context Lines	コンテキスト行を増やす
+复制 SHA	複製 SHA	Copy SHA	SHA をコピー
+复制仓库路径	複製儲存庫路徑	Copy Repository Path	リポジトリのパスをコピー
+复制分支名	複製分支名稱	Copy Branch Name	ブランチ名をコピー
+复制地址	複製位址	Copy URL	URL をコピー
+复制标签名	複製標籤名稱	Copy Tag Name	タグ名をコピー
+复制说明	複製說明	Copy Message	メッセージをコピー
+复制路径	複製路徑	Copy Path	パスをコピー
+外观	外觀	Appearance	外観
+失败	失敗	failed	失敗
+姓名	姓名	Name	名前
+子模块	子模組	Submodules	サブモジュール
+完成	完成	done	完了
+完整文件	完整檔案	Entire File	ファイル全体
+定位到 HEAD	定位到 HEAD	Show HEAD	HEAD を表示
+将进入分离 HEAD 状态。新提交不属于任何分支。	將進入分離 HEAD 狀態。新提交不屬於任何分支。	HEAD will be detached. New commits will not belong to any branch.	HEAD が切り離されます。新しいコミットはどのブランチにも属しません。
+尚无分支	尚無分支	No branches yet	ブランチはまだありません
+尚无提交	尚無提交	No commits yet	コミットはまだありません
+工作区是干净的	工作區是乾淨的	Working tree clean	作業ツリーはクリーンです
+工作区没有更改	工作區沒有變更	No changes in the working tree	作業ツリーに変更はありません
+差异过大，已省略 {count} 行	差異過大，已省略 {count} 行	Diff too large, {count} lines omitted	差分が大きすぎるため {count} 行を省略しました
+已切换到 {name}	已切換到 {name}	Switched to {name}	{name} に切り替えました
+已创建仓库 {path}	已建立儲存庫 {path}	Created repository {path}	リポジトリ {path} を作成しました
+已创建分支 {name}	已建立分支 {name}	Created branch {name}	ブランチ {name} を作成しました
+已提交 {id}	已提交 {id}	Committed {id}	{id} をコミットしました
+已暂存  {count}	已暫存  {count}	Staged  {count}	ステージ済み  {count}
+已暂存 {count} 个路径	已暫存 {count} 個路徑	Staged {count} paths	{count} 個のパスをステージしました
+已有任务在运行，请稍后再试	已有工作在執行，請稍後再試	Another operation is running. Try again later.	別の処理を実行中です。しばらくしてから再試行してください
+帮助	說明	Help	ヘルプ
+应用	套用	Apply	適用
+应用…	套用…	Apply…	適用…
+应用后删除该贮藏	套用後刪除該儲藏	Delete stash after applying	適用後にスタッシュを削除
+应用补丁 {name}	套用修補檔 {name}	Apply patch {name}	パッチ {name} を適用
+应用补丁…	套用修補檔…	Apply Patch…	パッチを適用…
+应用贮藏	套用儲藏	Apply Stash	スタッシュを適用
+应用贮藏 {stash}	套用儲藏 {stash}	Apply stash {stash}	スタッシュ {stash} を適用
+开始二分查找	開始二分搜尋	Start Bisect	二分探索を開始
+引用	參照	References	参照
+弹出最近的贮藏	彈出最近的儲藏	Pop Latest Stash	最新のスタッシュをポップ
+弹出贮藏…	彈出儲藏…	Pop Stash…	スタッシュをポップ…
+弹出（应用后删除）	彈出（套用後刪除）	Pop (apply and delete)	ポップ（適用して削除）
+强制推送 (--force-with-lease)	強制推送 (--force-with-lease)	Force push (--force-with-lease)	強制プッシュ (--force-with-lease)
+强制推送会覆盖远程分支上别人推送的提交。	強制推送會覆蓋遠端分支上別人推送的提交。	Force pushing overwrites commits others pushed to the remote branch.	強制プッシュは、他の人がリモートブランチにプッシュしたコミットを上書きします。
+当前不在任何分支上，无法推送	目前不在任何分支上，無法推送	Not on any branch; cannot push	どのブランチにもいないためプッシュできません
+当前仓库还没有提交	目前儲存庫還沒有提交	This repository has no commits yet	このリポジトリにはまだコミットがありません
+快进 {branch}	快轉 {branch}	Fast-forward {branch}	{branch} を早送り
+快进到 {upstream}	快轉到 {upstream}	Fast-forward to {upstream}	{upstream} まで早送り
+快速启动	快速啟動	Quick Launch	クイック起動
+快速启动…	快速啟動…	Quick Launch…	クイック起動…
+快速抓取	快速擷取	Quick Fetch	クイックフェッチ
+快速拉取	快速拉取	Quick Pull	クイックプル
+快速推送	快速推送	Quick Push	クイックプッシュ
+快速检出…	快速切換…	Quick Checkout…	クイックチェックアウト…
+快速贮藏	快速儲藏	Quick Stash	クイックスタッシュ
+忽略空白	忽略空白	Ignore Whitespace	空白を無視
+总是创建合并提交 (--no-ff)	總是建立合併提交 (--no-ff)	Always create a merge commit (--no-ff)	常にマージコミットを作成 (--no-ff)
+所选内容没有可应用的更改	所選內容沒有可套用的變更	The selection contains no changes to apply	選択範囲に適用できる変更がありません
+打开	開啟	Open	開く
+打开仓库	開啟儲存庫	Open Repository	リポジトリを開く
+打开仓库…	開啟儲存庫…	Open Repository…	リポジトリを開く…
+打开方式	開啟方式	Open in	開く
+打开本地仓库…	開啟本機儲存庫…	Open Local Repository…	ローカルリポジトリを開く…
+打开终端	開啟終端機	Open Terminal	ターミナルを開く
+找不到分支 {branch}	找不到分支 {branch}	Branch {branch} not found	ブランチ {branch} が見つかりません
+找不到配置目录	找不到設定目錄	Configuration directory not found	設定ディレクトリが見つかりません
+把 {branch} 合并到 {current}	把 {branch} 合併到 {current}	Merge {branch} into {current}	{branch} を {current} にマージ
+把 {current} 变基到 {onto}	把 {current} 重定基底到 {onto}	Rebase {current} onto {onto}	{current} を {onto} にリベース
+把 {current} 变基到此…	把 {current} 重定基底到此…	Rebase {current} onto Here…	{current} をここにリベース…
+把 {current} 变基到此分支…	把 {current} 重定基底到此分支…	Rebase {current} onto This Branch…	{current} をこのブランチにリベース…
+把 {current} 重置到 {label}	把 {current} 重設到 {label}	Reset {current} to {label}	{current} を {label} にリセット
+把 {current} 重置到此…	把 {current} 重設到此…	Reset {current} to Here…	{current} をここにリセット…
+抓取	擷取	Fetch	フェッチ
+抓取 {remote}	擷取 {remote}	Fetch {remote}	{remote} をフェッチ
+抓取…	擷取…	Fetch…	フェッチ…
+抓取所有远程仓库	擷取所有遠端儲存庫	Fetch all remotes	すべてのリモートをフェッチ
+折叠所有合并（只沿第一父提交）	摺疊所有合併（只沿第一父提交）	Collapse All Merges (First Parent Only)	すべてのマージを折りたたむ（最初の親のみ）
+拉取	拉取	Pull	プル
+拉取…	拉取…	Pull…	プル…
+拣选	揀選	Cherry-pick	チェリーピック
+拣选 {short}	揀選 {short}	Cherry-pick {short}	{short} をチェリーピック
+拣选…	揀選…	Cherry-pick…	チェリーピック…
+拣选提交	揀選提交	Cherry-pick Commit	コミットをチェリーピック
+拷贝	拷貝	Copy	コピー
+换行	換行	Wrap Lines	行を折り返す
+推送	推送	Push	プッシュ
+推送 {local} 到 {remote}	推送 {local} 到 {remote}	Push {local} to {remote}	{local} を {remote} にプッシュ
+推送…	推送…	Push…	プッシュ…
+推送到 {remote}	推送到 {remote}	Push to {remote}	{remote} にプッシュ
+推送到远程仓库	推送到遠端儲存庫	Push to remote	リモートにプッシュ
+推送标签 {name}	推送標籤 {name}	Push tag {name}	タグ {name} をプッシュ
+描述	描述	Description	説明
+提交	提交	Commit	コミット
+还有更多结果，请继续输入关键字	還有更多結果，請繼續輸入關鍵字	More results, keep typing to narrow them	さらに結果があります。キーワードを続けて入力してください
+提交…	提交…	Commit…	コミット…
+提交者	提交者	Committer	コミッター
+提交详情	提交詳細資訊	Commit Details	コミットの詳細
+提交说明不能为空	提交說明不能為空	Commit message cannot be empty	コミットメッセージを入力してください
+提交需要作者姓名和邮箱。将写入全局 Git 配置 (git config --global)。	提交需要作者姓名和電子郵件。將寫入全域 Git 設定 (git config --global)。	Commits need an author name and email. They are written to the global Git config (git config --global).	コミットには作成者の名前とメールアドレスが必要です。グローバル Git 設定 (git config --global) に書き込みます。
+搜索提交	搜尋提交	Search Commits	コミットを検索
+搜索范围	搜尋範圍	Search in	検索対象
+摘要	摘要	Summary	概要
+摘要不能为空	摘要不能為空	Summary cannot be empty	概要を入力してください
+提交说明，第一行是摘要	提交說明，第一行是摘要	Commit message, first line is the summary	コミットメッセージ。1行目が概要です
+撤销	復原	Undo	取り消す
+支持 HTTPS 和 SSH 地址，例如 git@github.com:owner/repo.git	支援 HTTPS 和 SSH 位址，例如 git@github.com:owner/repo.git	HTTPS and SSH URLs are supported, e.g. git@github.com:owner/repo.git	HTTPS と SSH の URL に対応しています（例: git@github.com:owner/repo.git）
+放弃	放棄	Discard	破棄
+放弃区块	放棄區塊	Discard Hunk	ハンクを破棄
+放弃所选行	放棄所選行	Discard Selected Lines	選択行を破棄
+放弃文件…	放棄檔案…	Discard File…	ファイルを破棄…
+放弃更改	放棄變更	Discard Changes	変更を破棄
+放弃更改…	放棄變更…	Discard Changes…	変更を破棄…
+整理仓库	整理儲存庫	Clean Up Repository	リポジトリを整理
+整理仓库 (git gc)	整理儲存庫 (git gc)	Clean up repository (git gc)	リポジトリを整理 (git gc)
+文件	檔案	File	ファイル
+文件历史	檔案歷史	File History	ファイル履歴
+文件历史 — {path}	檔案歷史 — {path}	File History — {path}	ファイル履歴 — {path}
+文件树	檔案樹	File Tree	ファイルツリー
+文件管理器	檔案管理器	File Manager	ファイルマネージャ
+文件过多，只列出了一部分	檔案過多，只列出了一部分	Too many files; showing only part of the list	ファイルが多すぎるため一部のみ表示しています
+文件过大（{size} 字节），不显示内容	檔案過大（{size} 位元組），不顯示內容	File too large ({size} bytes) to display	ファイルが大きすぎるため表示しません（{size} バイト）
+新名称	新名稱	New name	新しい名前
+新增	新增	Added	追加
+新建仓库…	新增儲存庫…	New Repository…	新規リポジトリ…
+新建分支…	新增分支…	New Branch…	新規ブランチ…
+新建本地仓库…	新增本機儲存庫…	Create New Local Repository…	新規ローカルリポジトリを作成…
+新建标签…	新增標籤…	New Tag…	新規タグ…
+新建标签页	新增分頁	New Tab	新規タブ
+方式	方式	Mode	モード
+无法以文本方式读取该文件	無法以文字方式讀取該檔案	The file cannot be read as text	このファイルはテキストとして読み込めません
+无法保存界面状态：{err}	無法儲存介面狀態：{err}	Could not save window state: {err}	画面の状態を保存できません：{err}
+无法启动 git: {err}	無法啟動 git: {err}	Could not start git: {err}	git を起動できません: {err}
+无法打开文件管理器: {err}	無法開啟檔案管理器: {err}	Could not open the file manager: {err}	ファイルマネージャを開けません: {err}
+无法打开终端: {err}	無法開啟終端機: {err}	Could not open a terminal: {err}	ターミナルを開けません: {err}
+无法打开链接: {err}	無法開啟連結: {err}	Could not open the link: {err}	リンクを開けません: {err}
+无法读取仓库	無法讀取儲存庫	Could not read the repository	リポジトリを読み込めません
+无（根提交）	無（根提交）	None (root commit)	なし（ルートコミット）
+昨天 %H:%M	昨天 %H:%M	Yesterday at %H:%M	昨日 %H:%M
+显示	顯示	View	表示
+显示全部提交	顯示全部提交	Show All Commits	すべてのコミットを表示
+显示或隐藏仓库管理器	顯示或隱藏儲存庫管理器	Show or Hide Repository Manager	リポジトリマネージャーの表示/非表示
+显示提交详情	顯示提交詳細資訊	Show Commit Details	コミットの詳細を表示
+显示本地更改	顯示本機變更	Show Local Changes	ローカルの変更を表示
+显示标签	顯示標籤	Show Tags	タグを表示
+显示详情面板	顯示詳細資訊面板	Show Details Pane	詳細パネルを表示
+显示远程分支	顯示遠端分支	Show Remote Branches	リモートブランチを表示
+暂存	暫存	Stage	ステージ
+暂存区块	暫存區塊	Stage Hunk	ハンクをステージ
+暂存所选行	暫存所選行	Stage Selected Lines	選択行をステージ
+暂存文件	暫存檔案	Stage File	ファイルをステージ
+更改	變更	Changes	変更
+更新	更新	Update	更新
+更新子模块 {module}	更新子模組 {module}	Update submodule {module}	サブモジュール {module} を更新
+最小化	最小化	Minimize	しまう
+最近打开	最近開啟	Open Recent	最近使用した項目
+最近的提交说明	最近的提交說明	Recent Messages	最近のコミットメッセージ
+服务	服務	Services	サービス
+未提交的更改会丢失。	未提交的變更會遺失。	Uncommitted changes will be lost.	コミットしていない変更は失われます。
+未暂存  {count}	未暫存  {count}	Unstaged  {count}	未ステージ  {count}
+未设置提交身份	未設定提交身分	Commit identity not set	コミット用の ID が未設定です
+未跟踪	未追蹤	Untracked	未追跡
+未配置提交身份。请设置 user.name 和 user.email	未設定提交身分。請設定 user.name 和 user.email	No commit identity configured. Set user.name and user.email.	コミット用の ID が未設定です。user.name と user.email を設定してください
+本地分支	本機分支	Local branch	ローカルブランチ
+本地分支名	本機分支名稱	Local branch name	ローカルブランチ名
+本地更改	本機變更	Local Changes	ローカルの変更
+查找提交…	尋找提交…	Find Commits…	コミットを検索…
+查看日志	查看記錄	View Log	ログを表示
+标签	標籤	Tags	タグ
+标签名	標籤名稱	Tag name	タグ名
+标记为已解决	標記為已解決	Mark as Resolved	解決済みにする
+检出	切換	Checkout	チェックアウト
+检出 {branch}	切換到 {branch}	Check Out {branch}	{branch} をチェックアウト
+检出 {branch}…	切換到 {branch}…	Check Out {branch}…	{branch} をチェックアウト…
+检出 {label}	切換到 {label}	Check out {label}	{label} をチェックアウト
+检出 {name}…	切換到 {name}…	Check Out {name}…	{name} をチェックアウト…
+检出 {remote_branch}	切換到 {remote_branch}	Check out {remote_branch}	{remote_branch} をチェックアウト
+检出 {short}（分离 HEAD）…	切換到 {short}（分離 HEAD）…	Check Out {short} (Detached HEAD)…	{short} をチェックアウト（HEAD を切り離し）…
+检出分支…	切換分支…	Checkout Branch…	ブランチをチェックアウト…
+检出远程分支	切換遠端分支	Check Out Remote Branch	リモートブランチをチェックアウト
+检出（分离 HEAD）…	切換（分離 HEAD）…	Check Out (Detached HEAD)…	チェックアウト（HEAD を切り離し）…
+概要	概要	Summary	概要
+正在二分查找。	正在二分搜尋。	Bisecting.	二分探索中です。
+正在克隆	正在複製	Cloning	クローン中
+正在变基。解决冲突并暂存后继续，或中止变基。	正在重定基底。解決衝突並暫存後繼續，或中止重定基底。	Rebasing. Resolve conflicts and stage them to continue, or abort the rebase.	リベース中です。競合を解決してステージしてから続行するか、リベースを中止してください。
+正在合并。解决冲突并暂存后继续，或中止合并。	正在合併。解決衝突並暫存後繼續，或中止合併。	Merging. Resolve conflicts and stage them to continue, or abort the merge.	マージ中です。競合を解決してステージしてから続行するか、マージを中止してください。
+正在应用补丁。	正在套用修補檔。	Applying patches.	パッチを適用中です。
+正在拣选。解决冲突并暂存后继续，或中止。	正在揀選。解決衝突並暫存後繼續，或中止。	Cherry-picking. Resolve conflicts and stage them to continue, or abort.	チェリーピック中です。競合を解決してステージしてから続行するか、中止してください。
+正在还原。解决冲突并暂存后继续，或中止。	正在還原。解決衝突並暫存後繼續，或中止。	Reverting. Resolve conflicts and stage them to continue, or abort.	リバート中です。競合を解決してステージしてから続行するか、中止してください。
+没有匹配的提交	沒有符合的提交	No matching commits	一致するコミットはありません
+没有匹配项	沒有符合項目	No matches	一致する項目はありません
+没有可提交的更改	沒有可提交的變更	Nothing to commit	コミットする変更はありません
+没有已暂存的更改	沒有已暫存的變更	No staged changes	ステージ済みの変更はありません
+没有找到修改该文件的提交	沒有找到修改該檔案的提交	No commits modified this file	このファイルを変更したコミットはありません
+没有找到可用的终端程序	沒有找到可用的終端機程式	No terminal program found	利用できるターミナルが見つかりません
+没有文本差异	沒有文字差異	No text differences	テキストの差分はありません
+没有最近的提交说明	沒有最近的提交說明	No recent messages	最近のコミットメッセージはありません
+没有未暂存的更改	沒有未暫存的變更	No unstaged changes	未ステージの変更はありません
+没有贮藏	沒有儲藏	No stashes	スタッシュはありません
+没有远程仓库	沒有遠端儲存庫	No remotes	リモートはありません
+没有选中的文件	沒有選取的檔案	No file selected	ファイルが選択されていません
+活动	活動	Activity	アクティビティ
+活动日志	活動記錄	Activity Log	アクティビティログ
+活动日志 — {name}	活動記錄 — {name}	Activity Log — {name}	アクティビティログ — {name}
+浅色	淺色	Light	ライト
+深色	深色	Dark	ダーク
+添加仓库	新增儲存庫	Add Repository	リポジトリを追加
+添加到 .gitignore	新增到 .gitignore	Add to .gitignore	.gitignore に追加
+添加远程仓库	新增遠端儲存庫	Add Remote	リモートを追加
+添加远程仓库 {name}	新增遠端儲存庫 {name}	Add remote {name}	リモート {name} を追加
+添加远程仓库…	新增遠端儲存庫…	Add Remote…	リモートを追加…
+点击变更行可以选择，Shift 点击选择范围；然后使用区块标题上的按钮。	點按變更行可以選取，Shift 點按選取範圍；然後使用區塊標題上的按鈕。	Click changed lines to select them, Shift-click to select a range, then use the buttons on the hunk header.	変更行をクリックで選択、Shift+クリックで範囲選択し、ハンクのヘッダーにあるボタンを使います。
+父提交	父提交	Parents	親
+版本 {version}	版本 {version}	Version {version}	バージョン {version}
+用变基代替合并 (--rebase)	用重定基底代替合併 (--rebase)	Rebase instead of merge (--rebase)	マージの代わりにリベース (--rebase)
+用合并工具打开	用合併工具開啟	Open in Merge Tool	マージツールで開く
+目录名	目錄名稱	Folder name	フォルダ名
+目标目录已存在	目標目錄已存在	The target folder already exists	保存先のフォルダは既に存在します
+确定从远程仓库删除 {name}？	確定從遠端儲存庫刪除 {name}？	Delete {name} from the remote?	リモートから {name} を削除しますか？
+确定删除本地分支 {name}？	確定刪除本機分支 {name}？	Delete local branch {name}?	ローカルブランチ {name} を削除しますか？
+确定删除标签 {name}？	確定刪除標籤 {name}？	Delete tag {name}?	タグ {name} を削除しますか？
+确定删除贮藏“{message}”？此操作无法撤销。	確定刪除儲藏「{message}」？此操作無法復原。	Delete stash "{message}"? This cannot be undone.	スタッシュ「{message}」を削除しますか？この操作は取り消せません。
+确定删除远程仓库 {name}？对应的远程跟踪分支也会删除。	確定刪除遠端儲存庫 {name}？對應的遠端追蹤分支也會刪除。	Delete remote {name}? Its remote-tracking branches are deleted too.	リモート {name} を削除しますか？対応するリモート追跡ブランチも削除されます。
+确定放弃 {count} 个文件的更改？未跟踪的文件会被删除，此操作无法撤销。	確定放棄 {count} 個檔案的變更？未追蹤的檔案會被刪除，此操作無法復原。	Discard changes in {count} files? Untracked files are deleted. This cannot be undone.	{count} 個のファイルの変更を破棄しますか？未追跡のファイルは削除されます。この操作は取り消せません。
+窗口	視窗	Window	ウインドウ
+立即提交	立即提交	Commit Now	今すぐコミット
+第 {index} 个父提交	第 {index} 個父提交	Parent {index}	{index} 番目の親
+等待 git 结束失败: {err}	等待 git 結束失敗: {err}	Failed to wait for git: {err}	git の終了待ちに失敗しました: {err}
+类型变更	類型變更	Type Changed	種類の変更
+粘贴	貼上	Paste	ペースト
+终端	終端機	Terminal	ターミナル
+结束二分查找	結束二分搜尋	End Bisect	二分探索を終了
+继续	繼續	Continue	続行
+编辑	編輯	Edit	編集
+编辑…	編輯…	Edit…	編集…
+编辑远程仓库	編輯遠端儲存庫	Edit Remote	リモートを編集
+编辑远程仓库 {original}	編輯遠端儲存庫 {original}	Edit remote {original}	リモート {original} を編集
+缩放	縮放	Zoom	拡大/縮小
+解决冲突 {path}	解決衝突 {path}	Resolve conflict in {path}	{path} の競合を解決
+设为 {current} 的上游	設為 {current} 的上游	Set as Upstream of {current}	{current} のアップストリームに設定
+设置	設定	Settings	設定
+设置…	設定…	Settings…	設定…
+设置上游	設定上游	Set Upstream	アップストリームを設定
+设置上游分支 (-u)	設定上游分支 (-u)	Set upstream branch (-u)	アップストリームブランチを設定 (-u)
+设置会立即生效并在下次启动时保留。	設定會立即生效並在下次啟動時保留。	Changes apply immediately and are kept for the next launch.	設定はすぐに反映され、次回の起動時にも保持されます。
+设置提交身份	設定提交身分	Set Commit Identity	コミット用の ID を設定
+语言	語言	Language	言語
+说明	說明	Message	メッセージ
+说明（留空则创建轻量标签）	說明（留空則建立輕量標籤）	Message (leave empty for a lightweight tag)	メッセージ（空欄で軽量タグ）
+请填写分支和远程仓库	請填寫分支和遠端儲存庫	Enter a branch and a remote	ブランチとリモートを入力してください
+请填写地址	請填寫位址	Enter a URL	URL を入力してください
+请填写地址和目录名	請填寫位址和目錄名稱	Enter a URL and a folder name	URL とフォルダ名を入力してください
+请填写姓名和有效邮箱	請填寫姓名和有效的電子郵件	Enter a name and a valid email	名前と有効なメールアドレスを入力してください
+请填写提交摘要	請填寫提交摘要	Enter a commit summary	コミットの概要を入力してください
+请指定要暂存的路径	請指定要暫存的路徑	Specify paths to stage	ステージするパスを指定してください
+请选择远程分支	請選擇遠端分支	Choose a remote branch	リモートブランチを選択してください
+贮藏	儲藏	Stash	スタッシュ
+贮藏后重新应用	儲藏後重新套用	Stash and reapply	スタッシュして再適用
+贮藏并重新应用本地更改 (--autostash)	儲藏並重新套用本機變更 (--autostash)	Stash and reapply local changes (--autostash)	ローカルの変更をスタッシュして再適用 (--autostash)
+贮藏更改	儲藏變更	Stash Changes	変更をスタッシュ
+贮藏更改…	儲藏變更…	Stash Changes…	変更をスタッシュ…
+起点: {start_label}	起點: {start_label}	Starting at: {start_label}	起点: {start_label}
+跟随系统	跟隨系統	System	システムに合わせる
+跨平台的本地 Git 客户端	跨平台的本機 Git 用戶端	A cross-platform local Git client	クロスプラットフォームのローカル Git クライアント
+路径不在仓库内: {path}	路徑不在儲存庫內: {path}	Path is outside the repository: {path}	パスがリポジトリの外にあります: {path}
+输入分支名快速检出	輸入分支名稱快速切換	Type a branch name to check out	ブランチ名を入力してチェックアウト
+输入命令	輸入指令	Type a command	コマンドを入力
+过滤仓库	篩選儲存庫	Filter Repositories	リポジトリを絞り込む
+还原	還原	Revert	リバート
+还原 {short}	還原 {short}	Revert {short}	{short} をリバート
+还原提交	還原提交	Revert Commit	コミットをリバート
+还原此提交…	還原此提交…	Revert This Commit…	このコミットをリバート…
+还没有打开过仓库	還沒有開啟過儲存庫	No repositories opened yet	まだリポジトリを開いていません
+远程仓库	遠端儲存庫	Remotes	リモート
+远程分支	遠端分支	Remote branch	リモートブランチ
+远程分支: {remote_branch}	遠端分支: {remote_branch}	Remote branch: {remote_branch}	リモートブランチ: {remote_branch}
+追溯 — {path}	追溯 — {path}	Blame — {path}	Blame — {path}
+追溯（逐行作者）	追溯（逐行作者）	Blame (line authors)	Blame（行ごとの作成者）
+退出	結束	Quit	終了
+退出 git-forker	結束 git-forker	Quit git-forker	git-forker を終了
+选择…	選擇…	Choose…	選択…
+选择一个提交查看文件树	選擇一個提交查看檔案樹	Select a commit to browse its files	コミットを選択するとファイルツリーを表示します
+选择一个提交查看详情	選擇一個提交查看詳細資訊	Select a commit to see its details	コミットを選択すると詳細を表示します
+选择一个文件	選擇一個檔案	Select a file	ファイルを選択
+选择新仓库的目录	選擇新儲存庫的目錄	Choose a folder for the new repository	新しいリポジトリのフォルダを選択
+选择补丁文件	選擇修補檔	Choose a patch file	パッチファイルを選択
+邮箱	電子郵件	Email	メールアドレス
+重做	重做	Redo	やり直す
+重命名	重新命名	Rename	名前を変更
+重命名…	重新命名…	Rename…	名前を変更…
+重命名分支	重新命名分支	Rename Branch	ブランチ名を変更
+重命名分支 {old}	重新命名分支 {old}	Rename branch {old}	ブランチ {old} の名前を変更
+重置	重設	Reset	リセット
+重置到 {label}	重設到 {label}	Reset to {label}	{label} にリセット
+重试	重試	Retry	再試行
+错误: {err}	錯誤: {err}	Error: {err}	エラー: {err}
+键盘快捷键	鍵盤快速鍵	Keyboard Shortcuts	キーボードショートカット
+隐藏 git-forker	隱藏 git-forker	Hide git-forker	git-forker を非表示
+隐藏其他	隱藏其他	Hide Others	ほかを非表示
+隐藏提交详情	隱藏提交詳細資訊	Hide Commit Details	コミットの詳細を非表示
+默认（可快进时快进）	預設（可快轉時快轉）	Default (fast-forward when possible)	デフォルト（可能なら早送り）
+，原路径 {old}	，原路徑 {old}	, previously {old}	、元のパス {old}
+搜索说明、作者或 SHA	搜尋說明、作者或 SHA	Search messages, authors or SHA	メッセージ、作成者、SHA を検索
+过滤	篩選	Filter	フィルタ
+过滤文件	篩選檔案	Filter Files	ファイルを絞り込む
+Git 程序	Git 程式	Git Program	Git プログラム
+上下文	上下文	Context	コンテキスト
+使用 PATH 里的 git	使用 PATH 中的 git	Use git from PATH	PATH の git を使用
+例如 Zhang San	例如 Zhang San	e.g. Zhang San	例：Zhang San
+写入全局 git 配置（~/.gitconfig），没有单独设置身份的仓库都会使用它。	寫入全域 git 設定（~/.gitconfig），沒有單獨設定身分的儲存庫都會使用它。	Saved to the global git config (~/.gitconfig) and used by every repository without its own identity.	グローバル git 設定（~/.gitconfig）に保存され、個別に ID を設定していないすべてのリポジトリで使われます。
+可执行文件	執行檔	Executable	実行ファイル
+启动	啟動	Startup	起動
+在主目录中试用	在主目錄中試用	Try in Home Folder	ホームフォルダで試す
+填写应用名称，例如 iTerm；留空时使用系统自带的「终端」。	填寫應用程式名稱，例如 iTerm；留空時使用系統內建的「終端機」。	Enter an app name such as iTerm. Leave empty to use the built-in Terminal.	iTerm などのアプリ名を入力します。空欄の場合は標準の「ターミナル」を使います。
+填写终端命令，例如 gnome-terminal；留空时自动查找可用的终端。	填寫終端機指令，例如 gnome-terminal；留空時自動尋找可用的終端機。	Enter a terminal command such as gnome-terminal. Leave empty to pick an available terminal automatically.	gnome-terminal などのコマンドを入力します。空欄の場合は利用できるターミナルを自動で探します。
+差异	差異	Diff	差分
+差异显示	差異顯示	Diff Display	差分の表示
+已保存到全局 git 配置	已儲存到全域 git 設定	Saved to the global git config	グローバル git 設定に保存しました
+忽略空白变化	忽略空白變更	Ignore whitespace changes	空白の変更を無視
+提交者身份	提交者身分	Committer Identity	コミッターの ID
+浏览…	瀏覽…	Browse…	参照…
+界面	介面	Interface	インターフェイス
+空白	空白	Whitespace	空白
+窗口回到前台时刷新当前仓库	視窗回到前景時重新整理目前儲存庫	Refresh the current repository when the window regains focus	ウィンドウが前面に戻ったら現在のリポジトリを更新
+系统默认	系統預設	System Default	システムのデフォルト
+终端程序	終端機程式	Terminal App	ターミナルアプリ
+行	行	lines	行
+行为	行為	Behavior	動作
+这些是仓库页的默认值，修改后会应用到所有已打开的仓库页；在仓库页里临时调整只影响当前页。	這些是儲存庫頁的預設值，修改後會套用到所有已開啟的儲存庫頁；在儲存庫頁中臨時調整只影響目前頁面。	These are the defaults for repository tabs. Changes apply to every open tab; adjustments made inside a tab only affect that tab.	リポジトリタブの既定値です。変更は開いているすべてのタブに反映されます。タブ内での一時的な調整はそのタブだけに適用されます。
+选择 git 可执行文件	選擇 git 執行檔	Choose git Executable	git の実行ファイルを選択
+通用	一般	General	一般
+重新打开上次的仓库标签页	重新開啟上次的儲存庫分頁	Reopen the repository tabs from last time	前回のリポジトリタブを再度開く
+长行自动换行	長行自動換行	Wrap long lines	長い行を折り返す
+集成	整合	Integration	連携
+仓库列表	儲存庫列表	Repositories	リポジトリ一覧
+正在读取仓库…	正在讀取儲存庫…	Loading repository…	リポジトリを読み込み中…
+保留已暂存的文件	保留已暫存的檔案	Keep staged files	ステージ済みのファイルを残す
+先暂存要提交的文件	先暫存要提交的檔案	Stage files to commit first	先にコミットするファイルをステージしてください
+请先解决冲突	請先解決衝突	Resolve the conflicts first	先にコンフリクトを解決してください
+本地有 {count} 个未提交的更改，拉取时会先贮藏再重新应用。与远端的修改重叠时会产生冲突，改动会留在贮藏里。	本地有 {count} 個未提交的變更，拉取時會先暫存再重新套用。與遠端的修改重疊時會產生衝突，變更會留在暫存中。	You have {count} uncommitted changes. They are stashed before the pull and reapplied afterwards. If they overlap with remote changes, the reapply conflicts and your changes stay in the stash.	未コミットの変更が {count} 件あります。プル前にスタッシュし、プル後に再適用します。リモートの変更と重なると競合し、変更はスタッシュに残ります。
+本地有 {count} 个未提交的更改。与远端的修改重叠时拉取会失败，请先提交或贮藏。	本地有 {count} 個未提交的變更。與遠端的修改重疊時拉取會失敗，請先提交或暫存。	You have {count} uncommitted changes. If they overlap with remote changes, the pull fails. Commit or stash them first.	未コミットの変更が {count} 件あります。リモートの変更と重なるとプルは失敗します。先にコミットまたはスタッシュしてください。
+{title}完成，但重新应用本地更改时有冲突，你的改动还在贮藏中	{title}完成，但重新套用本地變更時有衝突，你的變更還在暫存中	{title} finished, but reapplying your local changes conflicted. Your changes are still in the stash	{title}は完了しましたが、ローカルの変更の再適用で競合しました。変更はスタッシュに残っています
+着色	著色	Coloring	色分け
+语法着色	語法著色	Syntax	構文色
