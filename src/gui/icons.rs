@@ -51,6 +51,7 @@ pub enum Icon {
     Diff,
     Terminal,
     History,
+    ListTree,
 }
 
 impl Icon {
@@ -88,6 +89,7 @@ impl Icon {
             Icon::Diff => Lucide::FileDiff,
             Icon::Terminal => Lucide::SquareTerminal,
             Icon::History => Lucide::History,
+            Icon::ListTree => Lucide::ListTree,
         }
     }
 
@@ -150,6 +152,64 @@ pub fn paint(painter: &Painter, center: Pos2, size: f32, icon: Icon, color: Colo
         .filter(|ink| ink.is_positive())
         .unwrap_or(galley.rect);
     painter.galley(center - ink.center().to_vec2(), galley, color);
+}
+
+/// 实心小文件夹。线框图标缩到行高里会发虚，实心形状更清楚。
+pub fn paint_folder(painter: &Painter, center: Pos2, open: bool) {
+    let width = 14.0;
+    let height = 11.0;
+    let top_left = Pos2::new(center.x - width / 2.0, center.y - height / 2.0 + 0.5);
+    let tab = Rect::from_min_size(top_left, vec2(6.5, 3.5));
+    let body = Rect::from_min_max(
+        pos2(top_left.x, top_left.y + 2.0),
+        pos2(top_left.x + width, top_left.y + height),
+    );
+    let tab_color = Color32::from_rgb(0xc4, 0x8a, 0x2c);
+    let body_color = Color32::from_rgb(0xf0, 0xbe, 0x4a);
+    painter.rect_filled(
+        tab,
+        CornerRadius {
+            nw: 2,
+            ne: 2,
+            sw: 0,
+            se: 0,
+        },
+        tab_color,
+    );
+    if open {
+        painter.rect_filled(
+            body,
+            CornerRadius {
+                nw: 1,
+                ne: 2,
+                sw: 2,
+                se: 2,
+            },
+            tab_color,
+        );
+        let flap = Rect::from_min_max(pos2(body.left(), body.top() + 3.5), body.max);
+        painter.rect_filled(
+            flap,
+            CornerRadius {
+                nw: 1,
+                ne: 1,
+                sw: 2,
+                se: 2,
+            },
+            body_color,
+        );
+    } else {
+        painter.rect_filled(
+            body,
+            CornerRadius {
+                nw: 1,
+                ne: 2,
+                sw: 2,
+                se: 2,
+            },
+            body_color,
+        );
+    }
 }
 
 /// 文件状态徽标：彩色圆角方块里放白色图标，新增是加号，修改是铅笔，删除是减号。

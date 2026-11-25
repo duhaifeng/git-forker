@@ -20,7 +20,7 @@ use git_forker::{
 
 use super::dialogs::{Dialog, DialogContext, LocalChanges, MergeMode, Outcome, ResetMode};
 use super::diff_view::{self, DiffMode, DiffRequest, DiffSelection, DiffViewOptions, HunkOp};
-use super::icons::Icon;
+use super::icons::{self, Icon};
 use super::platform;
 use super::state::Preferences;
 use super::widgets::{self, LANE_WIDTH};
@@ -38,6 +38,13 @@ const MESSAGE_MENU_WIDTH: f32 = 440.0;
 const MESSAGE_MENU_HEIGHT: f32 = 300.0;
 /// 列表里一次画出的行数，其余靠关键字继续缩小。
 const MESSAGE_PICK_LIMIT: usize = 100;
+/// 未暂存和已暂存之间分割条的高度，也是鼠标可拖动的范围。
+const CHANGES_SPLIT_HANDLE: f32 = 8.0;
+/// 分割之后每一侧至少留下的高度，避免标题被拖没。
+const CHANGES_SECTION_MIN: f32 = 72.0;
+/// 树状视图里每一级目录的缩进。
+const CHANGES_TREE_INDENT: f32 = 14.0;
+const CHANGES_TREE_ROW: f32 = 22.0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum View {
@@ -70,6 +77,20 @@ enum Area {
     Unstaged,
     Staged,
     Conflicted,
+}
+
+/// 本地更改里文件的排列方式，对应 Fork 的 View as Tree / List / Combined List。
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+enum ChangesLayout {
+    List,
+    Tree,
+    Combined,
+}
+
+#[derive(Clone, Copy)]
+struct ListedChange<'a> {
+    change: &'a FileChange,
+    area: Area,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -184,6 +205,8 @@ pub struct RepoTab {
     focus_commit: bool,
     collapsed: HashSet<String>,
     expanded: HashSet<String>,
+    /// 本地更改树状视图里收起的目录，键是 `区域/路径`。
+    collapsed_changes: HashSet<String>,
     change_filter: String,
     selected_change: Option<SelectedChange>,
     change_diff: Option<Result<FileDiff, String>>,
@@ -296,6 +319,7 @@ impl RepoTab {
             focus_commit: false,
             collapsed: ["tags", "stashes", "submodules"].map(String::from).into(),
             expanded: HashSet::new(),
+            collapsed_changes: HashSet::new(),
             change_filter: String::new(),
             selected_change: None,
             change_diff: None,
@@ -1506,122 +1530,302 @@ impl RepoTab {
         let keep = |change: &&FileChange| {
             filter.is_empty() || change.path.to_lowercase().contains(&filter)
         };
-        let conflicted: Vec<&FileChange> = data.tree.conflicted.iter().filter(keep).collect();
-        let unstaged: Vec<&FileChange> = data.tree.unstaged.iter().filter(keep).collect();
-        let staged: Vec<&FileChange> = data.tree.staged.iter().filter(keep).collect();
+        let unstaged_items = listed_changes(
+            &data.tree.conflicted,
+            Area::Conflicted,
+            &data.tree.unstaged,
+            Area::Unstaged,
+            &keep,
+        );
+        let staged_items =
+            listed_changes(&data.tree.staged, Area::Staged, &[], Area::Staged, &keep);
 
-        let total = ui.available_height();
-        let half = ((total - 8.0) / 2.0).max(80.0);
+        let available = ui.available_rect_before_wrap();
+        let ratio = changes_split_ratio(ui);
+        let (top_rect, handle_rect, bottom_rect) = changes_split_rects(available, ratio);
+        // 先占住整块区域，后面的子界面和分割条画在它上面，才能吃到点击。
+        let _ = ui.allocate_rect(available, Sense::hover());
 
-        ui.allocate_ui(Vec2::new(ui.available_width(), half), |ui| {
-            ui.horizontal(|ui| {
-                ui.label(
-                    RichText::new(tr!(
-                        "未暂存  {count}",
-                        count = data.tree.unstaged.len() + data.tree.conflicted.len()
-                    ))
-                    .strong(),
-                );
-                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    if ui
-                        .add_enabled(
-                            !data.tree.unstaged.is_empty(),
-                            egui::Button::new(tr!("全部暂存")).small(),
-                        )
-                        .clicked()
-                    {
-                        self.actions.push(Action::StageAll);
-                    }
-                    let selected_unstaged = self
-                        .selected_change
-                        .as_ref()
-                        .filter(|s| s.area == Area::Unstaged)
-                        .cloned();
-                    if ui
-                        .add_enabled(
-                            selected_unstaged.is_some(),
-                            egui::Button::new(tr!("暂存")).small(),
-                        )
-                        .clicked()
-                        && let Some(selected) = selected_unstaged
-                    {
-                        self.actions.push(Action::Stage(vec![selected.path]));
-                    }
-                });
-            });
-            egui::ScrollArea::vertical()
-                .id_salt("unstaged")
-                .auto_shrink(false)
-                .show(ui, |ui| {
-                    for change in &conflicted {
-                        self.change_row(ui, change, Area::Conflicted);
-                    }
-                    for change in &unstaged {
-                        self.change_row(ui, change, Area::Unstaged);
-                    }
-                    if conflicted.is_empty() && unstaged.is_empty() {
-                        ui.weak(tr!("没有未暂存的更改"));
-                    }
-                });
-        });
-        ui.separator();
+        let mut top = ui.new_child(
+            egui::UiBuilder::new()
+                .id_salt("changes-unstaged")
+                .max_rect(top_rect)
+                .layout(Layout::top_down(Align::Min)),
+        );
+        top.shrink_clip_rect(top_rect);
+        self.change_section(
+            &mut top,
+            tr!(
+                "未暂存  {count}",
+                count = data.tree.unstaged.len() + data.tree.conflicted.len()
+            ),
+            true,
+            tr!("暂存"),
+            self.selected_change
+                .as_ref()
+                .filter(|selected| selected.area == Area::Unstaged)
+                .map(|selected| Action::Stage(vec![selected.path.clone()])),
+            tr!("全部暂存"),
+            !data.tree.unstaged.is_empty(),
+            Some(Action::StageAll),
+            &unstaged_items,
+            "unstaged",
+            tr!("没有未暂存的更改"),
+        );
+
+        let mut bottom = ui.new_child(
+            egui::UiBuilder::new()
+                .id_salt("changes-staged")
+                .max_rect(bottom_rect)
+                .layout(Layout::top_down(Align::Min)),
+        );
+        bottom.shrink_clip_rect(bottom_rect);
+        self.change_section(
+            &mut bottom,
+            tr!("已暂存  {count}", count = data.tree.staged.len()),
+            false,
+            tr!("取消暂存"),
+            self.selected_change
+                .as_ref()
+                .filter(|selected| selected.area == Area::Staged)
+                .map(|selected| Action::Unstage(vec![selected.path.clone()])),
+            tr!("全部取消暂存"),
+            !data.tree.staged.is_empty(),
+            Some(Action::UnstageAll),
+            &staged_items,
+            "staged",
+            tr!("没有已暂存的更改"),
+        );
+
+        paint_changes_split(ui, available, handle_rect);
+    }
+
+    fn change_section(
+        &mut self,
+        ui: &mut Ui,
+        title: String,
+        view_menu: bool,
+        primary_label: &str,
+        mut primary: Option<Action>,
+        all_label: &str,
+        all_enabled: bool,
+        mut all: Option<Action>,
+        items: &[ListedChange<'_>],
+        group: &str,
+        empty: &str,
+    ) {
         ui.horizontal(|ui| {
-            ui.label(
-                RichText::new(tr!("已暂存  {count}", count = data.tree.staged.len())).strong(),
-            );
+            ui.label(RichText::new(title).strong());
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 if ui
-                    .add_enabled(
-                        !data.tree.staged.is_empty(),
-                        egui::Button::new(tr!("全部取消暂存")).small(),
-                    )
+                    .add_enabled(all_enabled, egui::Button::new(all_label).small())
                     .clicked()
+                    && let Some(action) = all.take()
                 {
-                    self.actions.push(Action::UnstageAll);
+                    self.actions.push(action);
                 }
-                let selected_staged = self
-                    .selected_change
-                    .as_ref()
-                    .filter(|s| s.area == Area::Staged)
-                    .cloned();
                 if ui
-                    .add_enabled(
-                        selected_staged.is_some(),
-                        egui::Button::new(tr!("取消暂存")).small(),
-                    )
+                    .add_enabled(primary.is_some(), egui::Button::new(primary_label).small())
                     .clicked()
-                    && let Some(selected) = selected_staged
+                    && let Some(action) = primary.take()
                 {
-                    self.actions.push(Action::Unstage(vec![selected.path]));
+                    self.actions.push(action);
+                }
+                if view_menu {
+                    self.changes_view_button(ui);
                 }
             });
         });
+        self.show_change_files(ui, items, group, empty);
+    }
+
+    fn changes_view_button(&mut self, ui: &mut Ui) {
+        let response = icons::icon_button(ui, Icon::ListTree, tr!("更改的显示方式"));
+        let current = changes_layout(ui);
+        egui::Popup::menu(&response).show(|ui| {
+            for (layout, label) in [
+                (ChangesLayout::Tree, tr!("以树状显示")),
+                (ChangesLayout::List, tr!("以列表显示")),
+                (ChangesLayout::Combined, tr!("以合并列表显示")),
+            ] {
+                if ui.selectable_label(current == layout, label).clicked() {
+                    set_changes_layout(ui, layout);
+                    ui.close();
+                }
+            }
+        });
+    }
+
+    fn show_change_files(
+        &mut self,
+        ui: &mut Ui,
+        items: &[ListedChange<'_>],
+        group: &str,
+        empty: &str,
+    ) {
+        let layout = changes_layout(ui);
         egui::ScrollArea::vertical()
-            .id_salt("staged")
+            .id_salt(group)
             .auto_shrink(false)
             .show(ui, |ui| {
-                for change in &staged {
-                    self.change_row(ui, change, Area::Staged);
+                if items.is_empty() {
+                    ui.weak(empty);
+                    return;
                 }
-                if staged.is_empty() {
-                    ui.weak(tr!("没有已暂存的更改"));
+                match layout {
+                    ChangesLayout::List => {
+                        for item in items {
+                            self.change_row(ui, item.change, item.area);
+                        }
+                    }
+                    ChangesLayout::Combined => {
+                        let mut sorted = items.to_vec();
+                        sorted.sort_by(|a, b| a.change.path.cmp(&b.change.path));
+                        for item in &sorted {
+                            self.combined_row(ui, item.change, item.area);
+                        }
+                    }
+                    ChangesLayout::Tree => self.change_tree(ui, items, group),
                 }
             });
     }
 
+    fn change_tree(&mut self, ui: &mut Ui, items: &[ListedChange<'_>], group: &str) {
+        ui.spacing_mut().item_spacing.y = 0.0;
+        let mut sorted = items.to_vec();
+        sorted.sort_by(|a, b| a.change.path.cmp(&b.change.path));
+        let names: Vec<&str> = sorted
+            .iter()
+            .map(|item| item.change.path.as_str())
+            .collect();
+        let nodes = sidebar::tree(&names);
+        let forced_open = !self.change_filter.is_empty();
+        let mut hidden_below: Option<usize> = None;
+        for node in nodes {
+            let depth = match &node {
+                sidebar::Node::Folder { depth, .. } | sidebar::Node::Leaf { depth, .. } => *depth,
+            };
+            if let Some(limit) = hidden_below {
+                if depth > limit {
+                    continue;
+                }
+                hidden_below = None;
+            }
+            match node {
+                sidebar::Node::Folder { path, name, depth } => {
+                    let key = format!("{group}/{path}");
+                    let open = forced_open || !self.collapsed_changes.contains(&key);
+                    let prefix = format!("{path}/");
+                    let count = sorted
+                        .iter()
+                        .filter(|item| item.change.path.starts_with(&prefix))
+                        .count();
+                    let response = change_folder_row(ui, name, depth, open)
+                        .on_hover_text(tr!("{count} 个文件", count = count));
+                    if response.clicked() && !response.double_clicked() && !forced_open {
+                        if self.collapsed_changes.contains(&key) {
+                            self.collapsed_changes.remove(&key);
+                        } else {
+                            self.collapsed_changes.insert(key);
+                        }
+                    }
+                    let actionable = sorted.iter().any(|item| {
+                        item.area != Area::Conflicted && item.change.path.starts_with(&prefix)
+                    });
+                    if actionable {
+                        response.context_menu(|ui| self.change_folder_menu(ui, &path, &sorted));
+                    }
+                    if !open {
+                        hidden_below = Some(depth);
+                    }
+                }
+                sidebar::Node::Leaf { index, name, depth } => {
+                    let item = sorted[index];
+                    self.change_tree_file(ui, item.change, item.area, name, depth);
+                }
+            }
+        }
+    }
+
+    fn change_folder_menu(&mut self, ui: &mut Ui, folder: &str, items: &[ListedChange<'_>]) {
+        let prefix = format!("{folder}/");
+        let under: Vec<ListedChange<'_>> = items
+            .iter()
+            .copied()
+            .filter(|item| item.change.path.starts_with(&prefix))
+            .collect();
+        if under.iter().any(|item| item.area == Area::Staged) {
+            if ui.button(tr!("取消暂存此文件夹")).clicked() {
+                let paths = under.iter().map(|item| item.change.path.clone()).collect();
+                self.actions.push(Action::Unstage(paths));
+                ui.close();
+            }
+            return;
+        }
+        let unstaged: Vec<&FileChange> = under
+            .iter()
+            .filter(|item| item.area == Area::Unstaged)
+            .map(|item| item.change)
+            .collect();
+        if unstaged.is_empty() {
+            return;
+        }
+        if ui.button(tr!("暂存此文件夹")).clicked() {
+            self.actions.push(Action::Stage(
+                unstaged.iter().map(|change| change.path.clone()).collect(),
+            ));
+            ui.close();
+        }
+        if ui.button(tr!("放弃此文件夹的更改…")).clicked() {
+            self.dialog = Some(Dialog::Discard {
+                changes: unstaged.into_iter().cloned().collect(),
+            });
+            ui.close();
+        }
+    }
+
     fn change_row(&mut self, ui: &mut Ui, change: &FileChange, area: Area) {
-        let selected = self
-            .selected_change
+        let response = file_row(ui, change, self.change_selected(area, &change.path));
+        self.bind_change(response, change, area);
+    }
+
+    fn combined_row(&mut self, ui: &mut Ui, change: &FileChange, area: Area) {
+        let response = combined_file_row(ui, change, self.change_selected(area, &change.path));
+        self.bind_change(response, change, area);
+    }
+
+    fn change_tree_file(
+        &mut self,
+        ui: &mut Ui,
+        change: &FileChange,
+        area: Area,
+        name: &str,
+        depth: usize,
+    ) {
+        let response = tree_file_row(
+            ui,
+            change.kind,
+            name,
+            depth,
+            self.change_selected(area, &change.path),
+        );
+        self.bind_change(response, change, area);
+    }
+
+    fn change_selected(&self, area: Area, path: &str) -> bool {
+        self.selected_change
             .as_ref()
-            .is_some_and(|s| s.area == area && s.path == change.path);
-        let response = file_row(ui, change, selected);
+            .is_some_and(|selected| selected.area == area && selected.path == path)
+    }
+
+    fn bind_change(&mut self, response: egui::Response, change: &FileChange, area: Area) {
         let entry = SelectedChange {
             area,
             path: change.path.clone(),
             kind: change.kind,
         };
         if response.clicked() {
-            self.actions.push(Action::SelectChange(entry.clone()));
+            self.actions.push(Action::SelectChange(entry));
         }
         if response.double_clicked() {
             match area {
@@ -2423,6 +2627,95 @@ fn fuzzy_match(text: &str, query: &str) -> bool {
         .all(|wanted| chars.any(|c| c == wanted))
 }
 
+fn changes_layout(ui: &Ui) -> ChangesLayout {
+    ui.data_mut(|data| {
+        data.get_persisted(egui::Id::unique("changes-layout"))
+            .unwrap_or(ChangesLayout::List)
+    })
+}
+
+fn set_changes_layout(ui: &Ui, layout: ChangesLayout) {
+    ui.data_mut(|data| data.insert_persisted(egui::Id::unique("changes-layout"), layout));
+}
+
+fn changes_split_ratio(ui: &Ui) -> f32 {
+    ui.data_mut(|data| {
+        data.get_persisted(egui::Id::unique("changes-split"))
+            .unwrap_or(0.55)
+    })
+}
+
+/// 把可用高度分成未暂存、分割条、已暂存三段。比例超出范围时仍保证两侧都留有最小高度。
+fn changes_split_rects(available: Rect, ratio: f32) -> (Rect, Rect, Rect) {
+    let handle_h = CHANGES_SPLIT_HANDLE.min(available.height());
+    let usable = (available.height() - handle_h).max(0.0);
+    let top_h = if usable <= CHANGES_SECTION_MIN * 2.0 {
+        usable * 0.5
+    } else {
+        (usable * ratio).clamp(CHANGES_SECTION_MIN, usable - CHANGES_SECTION_MIN)
+    };
+    let top = Rect::from_min_size(available.min, Vec2::new(available.width(), top_h));
+    let handle = Rect::from_min_size(
+        Pos2::new(available.left(), top.bottom()),
+        Vec2::new(available.width(), handle_h),
+    );
+    let bottom = Rect::from_min_max(Pos2::new(available.left(), handle.bottom()), available.max);
+    (top, handle, bottom)
+}
+
+fn paint_changes_split(ui: &Ui, available: Rect, handle: Rect) {
+    let response = ui
+        .interact(
+            handle,
+            ui.scope_id().with("changes-split-handle"),
+            egui::Sense::DRAG,
+        )
+        .on_hover_and_drag_cursor(egui::CursorIcon::ResizeVertical);
+    let hot = response.hovered() || response.dragged();
+    if hot {
+        ui.painter()
+            .rect_filled(handle, 0.0, ui.visuals().widgets.hovered.weak_bg_fill);
+    }
+    let color = if hot {
+        ui.visuals().strong_text_color()
+    } else {
+        ui.visuals().widgets.noninteractive.bg_stroke.color
+    };
+    ui.painter().hline(
+        handle.x_range(),
+        handle.center().y,
+        egui::Stroke::new(if hot { 2.0 } else { 1.0 }, color),
+    );
+    if response.dragged() {
+        let usable = (available.height() - handle.height()).max(1.0);
+        let min_ratio = (CHANGES_SECTION_MIN / usable).min(0.5);
+        let ratio = (changes_split_ratio(ui) + response.drag_delta().y / usable)
+            .clamp(min_ratio, 1.0 - min_ratio);
+        ui.data_mut(|data| data.insert_persisted(egui::Id::unique("changes-split"), ratio));
+    }
+}
+
+fn listed_changes<'a>(
+    first: &'a [FileChange],
+    first_area: Area,
+    second: &'a [FileChange],
+    second_area: Area,
+    keep: &impl Fn(&&FileChange) -> bool,
+) -> Vec<ListedChange<'a>> {
+    first
+        .iter()
+        .filter(keep)
+        .map(|change| ListedChange {
+            change,
+            area: first_area,
+        })
+        .chain(second.iter().filter(keep).map(|change| ListedChange {
+            change,
+            area: second_area,
+        }))
+        .collect()
+}
+
 fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response {
     let width = ui.available_width();
     let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 20.0), Sense::click());
@@ -2460,6 +2753,106 @@ fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response 
         );
     }
     response
+}
+
+/// 合并列表：整条相对路径画在一行里。
+fn combined_file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response {
+    let width = ui.available_width();
+    let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 20.0), Sense::click());
+    paint_change_row_background(ui, rect, &response, selected);
+    let badge = Rect::from_min_size(rect.min + Vec2::new(2.0, 0.0), Vec2::new(18.0, 20.0));
+    widgets::paint_change_badge(ui, badge, change.kind);
+    paint_change_label(
+        ui,
+        rect,
+        badge.right() + 6.0,
+        &change.path,
+        change_row_text_color(ui, selected),
+    );
+    response
+}
+
+fn change_folder_row(ui: &mut Ui, name: &str, depth: usize, open: bool) -> egui::Response {
+    let width = ui.available_width();
+    let (rect, response) =
+        ui.allocate_exact_size(Vec2::new(width, CHANGES_TREE_ROW), Sense::click());
+    if response.hovered() {
+        ui.painter()
+            .rect_filled(rect, 2.0, ui.visuals().widgets.hovered.weak_bg_fill);
+    }
+    let weak = ui.visuals().weak_text_color();
+    let mut x = rect.left() + 4.0 + depth as f32 * CHANGES_TREE_INDENT;
+    let y = rect.center().y;
+    let chevron = if open {
+        Icon::ChevronDown
+    } else {
+        Icon::ChevronRight
+    };
+    icons::paint(
+        ui.painter(),
+        Pos2::new(x + icons::SMALL / 2.0, y),
+        icons::SMALL,
+        chevron,
+        weak,
+    );
+    x += 14.0;
+    icons::paint_folder(ui.painter(), Pos2::new(x + 7.0, y), open);
+    paint_change_label(ui, rect, x + 18.0, name, ui.visuals().text_color());
+    response
+}
+
+fn tree_file_row(
+    ui: &mut Ui,
+    kind: ChangeKind,
+    name: &str,
+    depth: usize,
+    selected: bool,
+) -> egui::Response {
+    let width = ui.available_width();
+    let (rect, response) =
+        ui.allocate_exact_size(Vec2::new(width, CHANGES_TREE_ROW), Sense::click());
+    paint_change_row_background(ui, rect, &response, selected);
+    // 文件徽标和同级目录图标对齐，前面留出箭头的位置。
+    let x = rect.left() + 4.0 + depth as f32 * CHANGES_TREE_INDENT + 14.0;
+    let badge = Rect::from_min_size(Pos2::new(x, rect.center().y - 10.0), Vec2::new(18.0, 20.0));
+    widgets::paint_change_badge(ui, badge, kind);
+    paint_change_label(
+        ui,
+        rect,
+        badge.right() + 6.0,
+        name,
+        change_row_text_color(ui, selected),
+    );
+    response
+}
+
+fn paint_change_row_background(ui: &Ui, rect: Rect, response: &egui::Response, selected: bool) {
+    let visuals = ui.visuals();
+    if selected {
+        ui.painter()
+            .rect_filled(rect, 2.0, visuals.selection.bg_fill);
+    } else if response.hovered() {
+        ui.painter()
+            .rect_filled(rect, 2.0, visuals.widgets.hovered.weak_bg_fill);
+    }
+}
+
+fn change_row_text_color(ui: &Ui, selected: bool) -> Color32 {
+    if selected {
+        ui.visuals().selection.stroke.color
+    } else {
+        ui.visuals().text_color()
+    }
+}
+
+fn paint_change_label(ui: &Ui, rect: Rect, x: f32, text: &str, color: Color32) {
+    let painter = ui.painter().with_clip_rect(rect);
+    let galley = painter.layout_no_wrap(text.to_string(), FontId::proportional(13.0), color);
+    painter.galley(
+        Pos2::new(x, rect.center().y - galley.size().y / 2.0),
+        galley,
+        color,
+    );
 }
 
 /// 贮藏栈顶的提交 ID；没有贮藏时为 `None`。
@@ -2595,4 +2988,26 @@ fn append_gitignore(root: &Path, path: &str) -> std::io::Result<()> {
         writeln!(handle)?;
     }
     writeln!(handle, "{entry}")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn split_keeps_both_change_sections_usable() {
+        let available = Rect::from_min_size(Pos2::ZERO, Vec2::new(300.0, 400.0));
+        let (top, handle, bottom) = changes_split_rects(available, 0.55);
+        let usable = 400.0 - CHANGES_SPLIT_HANDLE;
+        assert!((top.height() - usable * 0.55).abs() < 0.1);
+        assert_eq!(handle.top(), top.bottom());
+        assert_eq!(bottom.top(), handle.bottom());
+        assert!((bottom.bottom() - available.bottom()).abs() < 0.1);
+        assert!(top.height() >= CHANGES_SECTION_MIN);
+        assert!(bottom.height() >= CHANGES_SECTION_MIN);
+
+        let (top, _, bottom) = changes_split_rects(available, 0.99);
+        assert!((top.height() - (usable - CHANGES_SECTION_MIN)).abs() < 0.1);
+        assert!((bottom.height() - CHANGES_SECTION_MIN).abs() < 0.1);
+    }
 }

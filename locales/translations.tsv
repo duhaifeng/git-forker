@@ -108,6 +108,7 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 取消暂存区块	取消暫存區塊	Unstage Hunk	ハンクをアンステージ
 取消暂存所选行	取消暫存所選行	Unstage Selected Lines	選択行をアンステージ
 取消暂存文件	取消暫存檔案	Unstage File	ファイルをアンステージ
+取消暂存此文件夹	取消暫存此資料夾	Unstage This Folder	このフォルダをアンステージ
 取消跟踪上游	取消追蹤上游	Unset Upstream	アップストリームの追跡を解除
 变基	重定基底	Rebase	リベース
 变基到 {onto}	重定基底到 {onto}	Rebase onto {onto}	{onto} にリベース
@@ -248,6 +249,7 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 放弃文件…	放棄檔案…	Discard File…	ファイルを破棄…
 放弃更改	放棄變更	Discard Changes	変更を破棄
 放弃更改…	放棄變更…	Discard Changes…	変更を破棄…
+放弃此文件夹的更改…	放棄此資料夾的變更…	Discard Changes in This Folder…	このフォルダの変更を破棄…
 整理仓库	整理儲存庫	Clean Up Repository	リポジトリを整理
 整理仓库 (git gc)	整理儲存庫 (git gc)	Clean up repository (git gc)	リポジトリを整理 (git gc)
 文件	檔案	File	ファイル
@@ -279,6 +281,9 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 显示或隐藏仓库管理器	顯示或隱藏儲存庫管理器	Show or Hide Repository Manager	リポジトリマネージャーの表示/非表示
 显示提交详情	顯示提交詳細資訊	Show Commit Details	コミットの詳細を表示
 显示本地更改	顯示本機變更	Show Local Changes	ローカルの変更を表示
+以列表显示	以清單顯示	View as List	リストで表示
+以合并列表显示	以合併清單顯示	View as Combined List	結合リストで表示
+以树状显示	以樹狀顯示	View as Tree	ツリーで表示
 显示标签	顯示標籤	Show Tags	タグを表示
 显示详情面板	顯示詳細資訊面板	Show Details Pane	詳細パネルを表示
 显示远程分支	顯示遠端分支	Show Remote Branches	リモートブランチを表示
@@ -286,7 +291,9 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 暂存区块	暫存區塊	Stage Hunk	ハンクをステージ
 暂存所选行	暫存所選行	Stage Selected Lines	選択行をステージ
 暂存文件	暫存檔案	Stage File	ファイルをステージ
+暂存此文件夹	暫存此資料夾	Stage This Folder	このフォルダをステージ
 更改	變更	Changes	変更
+更改的显示方式	變更的顯示方式	How files are shown	ファイルの表示方法
 更新	更新	Update	更新
 更新子模块 {module}	更新子模組 {module}	Update submodule {module}	サブモジュール {module} を更新
 最小化	最小化	Minimize	しまう

@@ -10,8 +10,8 @@ use crate::gui::theme;
 const ROW_HEIGHT: f32 = 24.0;
 const INDENT: f32 = 14.0;
 
-/// 侧栏里按 `/` 分组后的一行。
-enum Node<'a> {
+/// 按 `/` 分组后的一行。输入需要已排序。
+pub(super) enum Node<'a> {
     Folder {
         path: String,
         name: &'a str,
@@ -25,7 +25,7 @@ enum Node<'a> {
 }
 
 /// 把 `feature/a`、`feature/b` 这样的名字整理成文件夹树。输入需要已排序。
-fn tree<'a>(names: &[&'a str]) -> Vec<Node<'a>> {
+pub(super) fn tree<'a>(names: &[&'a str]) -> Vec<Node<'a>> {
     let mut nodes = Vec::new();
     let mut open: Vec<&str> = Vec::new();
     for (index, name) in names.iter().enumerate() {
