@@ -81,6 +81,14 @@ git-forker switch main
 | `./package-mac.sh` | 在 macOS 上生成 `dist/git-forker.app` 和对应的 zip |
 | `./package-deb.sh` | 生成 `dist/git-forker_<版本>_amd64.deb`。在 Linux x86_64 上本地编译；在其他系统上通过 Docker 编译 `linux/amd64` |
 
+在 macOS 上，从浏览器下载的应用会被标上隔离属性。如果系统提示应用已损坏或无法打开，执行下面的命令去掉隔离属性，然后再打开：
+
+```bash
+xattr -dr com.apple.quarantine /Applications/git-forker.app
+```
+
+如果 `git-forker.app` 不在「应用程序」里，把路径换成它的实际位置。
+
 没有 Windows 安装包脚本。在 Windows 上执行 `cargo build --release`，然后运行 `target/release/git-forker`。
 
 ## 开发

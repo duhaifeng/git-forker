@@ -81,6 +81,14 @@ Packaging scripts live in the repository. They are not required to build from so
 | `./package-mac.sh` | `dist/git-forker.app` and a zip, on macOS |
 | `./package-deb.sh` | `dist/git-forker_<version>_amd64.deb`. On Linux x86_64 it builds locally; elsewhere it builds `linux/amd64` with Docker |
 
+On macOS, a copy downloaded from the browser is quarantined. If the system says the app is damaged or cannot be opened, clear that attribute and open it again:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/git-forker.app
+```
+
+If `git-forker.app` is not in Applications, use its actual path.
+
 There is no Windows installer script. Build with `cargo build --release` and run `target/release/git-forker`.
 
 ## Development
