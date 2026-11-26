@@ -1393,7 +1393,7 @@ dependencies = [
 
 [[package]]
 name = "git-forker"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "arboard",
  "chrono",

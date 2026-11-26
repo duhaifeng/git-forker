@@ -1,6 +1,6 @@
 [package]
 name = "git-forker"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "跨平台的本地 Git 客户端"
 license = "MIT"

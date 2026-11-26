@@ -34,12 +34,18 @@ if [ ! -f "$svg" ]; then
   exit 1
 fi
 
+# 清空 dist 里的全部内容，但保留目录本身。
+clean_dist() {
+  mkdir -p "$root/dist"
+  find "$root/dist" -mindepth 1 -delete
+}
+
+clean_dist
 printf '正在编译发布版本…\n'
 cargo build --release --locked
 bin="$root/target/release/git-forker"
 
 app="$root/dist/git-forker.app"
-rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
 install -m 0755 "$bin" "$app/Contents/MacOS/git-forker"
@@ -118,7 +124,6 @@ if command -v codesign >/dev/null 2>&1; then
 fi
 
 zip="$root/dist/git-forker_${version}_macos_${arch}.zip"
-rm -f "$zip"
 ditto -c -k --keepParent "$app" "$zip"
 printf '已生成 %s\n' "$app"
 printf '已生成 %s\n' "$zip"

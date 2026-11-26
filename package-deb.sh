@@ -54,7 +54,14 @@ ensure_native_tools() {
   fi
 }
 
+# 清空 dist 里的全部内容，但保留目录本身（Docker 挂载点不能删掉）。
+clean_dist() {
+  mkdir -p "$root/dist"
+  find "$root/dist" -mindepth 1 -delete
+}
+
 pack_deb() {
+  clean_dist
   if [ -z "${CARGO_TARGET_DIR:-}" ]; then
     export CARGO_TARGET_DIR="$root/target"
   fi
@@ -72,7 +79,8 @@ pack_deb() {
   fi
 
   stage=$(mktemp -d)
-  trap 'rm -rf "$stage"' EXIT
+  shlib_work=$(mktemp -d)
+  trap 'rm -rf "$stage" "$shlib_work"' EXIT
   install -d -m 0755 \
     "$stage/DEBIAN" \
     "$stage/usr/bin" \
@@ -100,13 +108,19 @@ EOF
 
   shlibs=
   if command -v dpkg-shlibdeps >/dev/null 2>&1; then
+    # dpkg-shlibdeps 会读取当前目录的 debian/control，不能放进打包目录。
+    mkdir -p "$shlib_work/debian"
+    printf 'Source: git-forker\n\nPackage: git-forker\nArchitecture: amd64\n' > "$shlib_work/debian/control"
     set +e
-    shlibs_out=$(dpkg-shlibdeps --ignore-missing-info -O "$stage/usr/bin/git-forker" 2>"$stage/shlibdeps.err")
+    shlibs_out=$(
+      cd "$shlib_work"
+      dpkg-shlibdeps --ignore-missing-info -O "$stage/usr/bin/git-forker" 2>"$shlib_work/shlibdeps.err"
+    )
     shlibs_status=$?
     set -e
-    if [ "$shlibs_status" -ne 0 ] && [ -s "$stage/shlibdeps.err" ]; then
+    if [ "$shlibs_status" -ne 0 ] && [ -s "$shlib_work/shlibdeps.err" ]; then
       printf 'dpkg-shlibdeps 提示：\n' >&2
-      cat "$stage/shlibdeps.err" >&2
+      cat "$shlib_work/shlibdeps.err" >&2
     fi
     shlibs=$(printf '%s\n' "$shlibs_out" | sed -n 's/^shlibs:Depends=//p')
   fi
@@ -132,9 +146,8 @@ Description: cross-platform local Git client
  图形界面的本地 Git 客户端，仓库操作通过系统自带的 git 完成。
 EOF
 
-  mkdir -p "$root/dist"
+  chmod 755 "$stage"
   out="$root/dist/git-forker_${version}_amd64.deb"
-  rm -f "$out"
   deb_args=
   if dpkg-deb --help 2>&1 | grep -q root-owner-group; then
     deb_args=--root-owner-group
