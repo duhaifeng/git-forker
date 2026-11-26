@@ -140,7 +140,7 @@ impl RepoTab {
                     let response = ui
                         .horizontal(|ui| {
                             ui.add_space(10.0);
-                            file_row(ui, file, selected)
+                            file_row(ui, file, selected, false).response
                         })
                         .inner;
                     if response.clicked() {
@@ -172,7 +172,7 @@ impl RepoTab {
                     .show(ui, |ui| {
                         for file in &details.files {
                             let selected = self.details_file.as_deref() == Some(file.path.as_str());
-                            let response = file_row(ui, file, selected);
+                            let response = file_row(ui, file, selected, false).response;
                             if response.clicked() {
                                 self.actions
                                     .push(Action::SelectDetailsFile(file.path.clone()));

@@ -271,28 +271,37 @@ impl Repo {
     }
 
     /// 把工作区文件恢复为暂存区内容。未跟踪文件直接删除。
+    /// 未暂存的重命名会恢复旧路径，并删掉新路径。
     pub fn discard_paths(&self, changes: &[FileChange]) -> Result<(), Error> {
         let workdir = self.inner.workdir().ok_or(Error::NoWorkdir)?;
-        let mut tracked = Vec::new();
+        let mut restore = Vec::new();
+        let mut remove = Vec::new();
         for change in changes {
-            if change.kind == ChangeKind::Untracked {
-                let full = workdir.join(&change.path);
-                if full.is_dir() {
-                    std::fs::remove_dir_all(full)?;
-                } else if full.symlink_metadata().is_ok() {
-                    std::fs::remove_file(full)?;
-                }
-            } else {
-                tracked.push(change.path.as_str());
+            match change.kind {
+                ChangeKind::Untracked => remove.push(change.path.clone()),
+                ChangeKind::Renamed => match change.old_path.as_deref() {
+                    Some(old) if old != change.path => {
+                        restore.push(old.to_string());
+                        remove.push(change.path.clone());
+                    }
+                    _ => restore.push(change.path.clone()),
+                },
+                _ => restore.push(change.path.clone()),
             }
         }
-        if !tracked.is_empty() {
+        if !restore.is_empty() {
             let mut checkout = CheckoutBuilder::new();
             checkout.force();
-            for path in &tracked {
-                checkout.path(path);
+            for path in &restore {
+                checkout.path(path.as_str());
             }
             self.inner.checkout_index(None, Some(&mut checkout))?;
+        }
+        for path in &remove {
+            if restore.iter().any(|restored| restored == path) {
+                continue;
+            }
+            remove_worktree_path(workdir, path)?;
         }
         Ok(())
     }
@@ -854,6 +863,16 @@ fn diff_options(settings: DiffSettings) -> DiffOptions {
     options
 }
 
+fn remove_worktree_path(workdir: &Path, path: &str) -> Result<(), Error> {
+    let full = workdir.join(path);
+    if full.is_dir() {
+        std::fs::remove_dir_all(full)?;
+    } else if full.symlink_metadata().is_ok() {
+        std::fs::remove_file(full)?;
+    }
+    Ok(())
+}
+
 fn delta_kind(delta: Delta) -> ChangeKind {
     match delta {
         Delta::Added | Delta::Copied => ChangeKind::Added,
@@ -1143,6 +1162,44 @@ mod tests {
             "1\n"
         );
         assert!(!dir.path().join("new.txt").exists());
+    }
+
+    #[test]
+    fn discard_undoes_workdir_rename_and_keeps_staged_edits() {
+        let (dir, repo) = repo_with_identity();
+        commit_file(dir.path(), &repo, "old.txt", "1\n", "init");
+        commit_file(dir.path(), &repo, "a.txt", "one\n", "second");
+        std::fs::rename(dir.path().join("old.txt"), dir.path().join("new.txt")).unwrap();
+        std::fs::write(dir.path().join("a.txt"), "staged\n").unwrap();
+        repo.stage_paths(&["a.txt".into()]).unwrap();
+        std::fs::write(dir.path().join("a.txt"), "unstaged\n").unwrap();
+
+        let tree = repo.working_tree().unwrap();
+        let renamed = tree
+            .unstaged
+            .iter()
+            .find(|change| change.kind == ChangeKind::Renamed)
+            .expect("相同内容的改名应记成一条重命名");
+        assert_eq!(renamed.path, "new.txt");
+        assert_eq!(renamed.old_path.as_deref(), Some("old.txt"));
+        let modified = tree
+            .unstaged
+            .iter()
+            .find(|change| change.path == "a.txt")
+            .unwrap();
+        repo.discard_paths(&[renamed.clone(), modified.clone()])
+            .unwrap();
+
+        assert_eq!(
+            std::fs::read_to_string(dir.path().join("old.txt")).unwrap(),
+            "1\n"
+        );
+        assert!(!dir.path().join("new.txt").exists());
+        // 只丢掉未暂存的修改，已暂存的内容留在工作区。
+        assert_eq!(
+            std::fs::read_to_string(dir.path().join("a.txt")).unwrap(),
+            "staged\n"
+        );
     }
 
     #[test]

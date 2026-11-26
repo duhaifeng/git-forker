@@ -42,6 +42,7 @@ pub enum Icon {
     Plus,
     Minus,
     Close,
+    Revert,
     Copy,
     Pencil,
     ArrowRight,
@@ -80,6 +81,7 @@ impl Icon {
             Icon::Plus => Lucide::Plus,
             Icon::Minus => Lucide::Minus,
             Icon::Close => Lucide::X,
+            Icon::Revert => Lucide::RotateCcw,
             Icon::Copy => Lucide::Copy,
             Icon::Pencil => Lucide::Pencil,
             Icon::ArrowRight => Lucide::ArrowRight,
@@ -155,6 +157,7 @@ pub fn paint(painter: &Painter, center: Pos2, size: f32, icon: Icon, color: Colo
 }
 
 /// 实心小文件夹。线框图标缩到行高里会发虚，实心形状更清楚。
+/// 颜色用系统文件夹那种蓝，不用黄文件夹。
 pub fn paint_folder(painter: &Painter, center: Pos2, open: bool) {
     let width = 14.0;
     let height = 11.0;
@@ -164,8 +167,8 @@ pub fn paint_folder(painter: &Painter, center: Pos2, open: bool) {
         pos2(top_left.x, top_left.y + 2.0),
         pos2(top_left.x + width, top_left.y + height),
     );
-    let tab_color = Color32::from_rgb(0xc4, 0x8a, 0x2c);
-    let body_color = Color32::from_rgb(0xf0, 0xbe, 0x4a);
+    let tab_color = Color32::from_rgb(0x3e, 0x92, 0xd8);
+    let body_color = Color32::from_rgb(0x5a, 0xb6, 0xf6);
     painter.rect_filled(
         tab,
         CornerRadius {

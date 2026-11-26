@@ -14,8 +14,8 @@ use eframe::egui::{
 };
 use git_forker::{
     BlameLine, BlobContent, ChangeKind, CommitDetails, DiffSettings, FileChange, FileDiff, GitJob,
-    HeadState, History, HistoryOptions, JobHandle, Oid, PatchDirection, RefsSnapshot, Repo,
-    RepoOperation, WorkingTree, git_output, hunk_patch,
+    HeadState, History, HistoryOptions, JobHandle, Oid, PULL_STASH_MESSAGE, PatchDirection,
+    RefsSnapshot, Repo, RepoOperation, WorkingTree, git_output, hunk_patch,
 };
 
 use super::dialogs::{Dialog, DialogContext, LocalChanges, MergeMode, Outcome, ResetMode};
@@ -45,6 +45,8 @@ const CHANGES_SECTION_MIN: f32 = 72.0;
 /// 树状视图里每一级目录的缩进。
 const CHANGES_TREE_INDENT: f32 = 14.0;
 const CHANGES_TREE_ROW: f32 = 22.0;
+/// 未暂存文件行右侧删除按钮占的宽度。
+const DISCARD_SLOT: f32 = 22.0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum View {
@@ -93,11 +95,18 @@ struct ListedChange<'a> {
     area: Area,
 }
 
+struct ChangeRow {
+    response: egui::Response,
+    /// 指针停在右侧删除按钮上。
+    over_discard: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct SelectedChange {
     area: Area,
     path: String,
     kind: ChangeKind,
+    old_path: Option<String>,
 }
 
 /// 文件树页的文件列表，以及是否因数量上限被截断。
@@ -224,7 +233,7 @@ pub struct RepoTab {
     amend: bool,
 
     job: Option<JobHandle>,
-    /// 带 `--autostash` 的任务开始前的贮藏栈顶；任务结束后用来判断是否留下了自动贮藏。
+    /// 会自动贮藏的任务开始前的贮藏栈顶；任务结束后用来判断重新应用是否留下了贮藏。
     autostash_before: Option<Option<String>>,
     after_job: AfterJob,
     log: Vec<String>,
@@ -474,6 +483,7 @@ impl RepoTab {
                 Some(change) => {
                     let selected = SelectedChange {
                         kind: change.kind,
+                        old_path: change.old_path.clone(),
                         ..selected.clone()
                     };
                     self.load_change_diff(repo, &selected);
@@ -507,6 +517,7 @@ impl RepoTab {
                     area,
                     path: change.path.clone(),
                     kind: change.kind,
+                    old_path: change.old_path.clone(),
                 };
                 self.load_change_diff(repo, &selected);
                 self.selected_change = Some(selected);
@@ -784,11 +795,12 @@ impl RepoTab {
         let ctx = ctx.clone();
         self.after_job = after;
         self.notice = None;
-        self.autostash_before = job
-            .steps
-            .iter()
-            .any(|step| step.iter().any(|arg| arg == "--autostash"))
-            .then(|| stash_top(&self.root));
+        self.autostash_before = (job.stash_if_blocked
+            || job
+                .steps
+                .iter()
+                .any(|step| step.iter().any(|arg| arg == "--autostash")))
+        .then(|| stash_top(&self.root));
         self.job = Some(JobHandle::spawn(job, move || ctx.request_repaint()));
     }
 
@@ -1504,6 +1516,7 @@ impl RepoTab {
     // ---- 本地更改 ----
 
     fn changes_view(&mut self, ui: &mut Ui, data: &TabData) {
+        self.discard_selected_on_delete(ui, data);
         egui::Panel::left("changes-files")
             .resizable(true)
             .default_size(360.0)
@@ -1598,6 +1611,38 @@ impl RepoTab {
         );
 
         paint_changes_split(ui, available, handle_rect);
+    }
+
+    /// 选中未暂存文件时，Delete 键放弃它的改动。Mac 上标着 delete 的键是退格。
+    fn discard_selected_on_delete(&mut self, ui: &mut Ui, data: &TabData) {
+        if self.has_modal() || ui.ctx().text_edit_focused() {
+            return;
+        }
+        let Some(selected) = &self.selected_change else {
+            return;
+        };
+        if selected.area != Area::Unstaged {
+            return;
+        }
+        let pressed = ui.input_mut(|input| {
+            input.consume_key(egui::Modifiers::NONE, Key::Delete)
+                || input.consume_key(egui::Modifiers::NONE, Key::Backspace)
+        });
+        if !pressed {
+            return;
+        }
+        let Some(change) = data
+            .tree
+            .unstaged
+            .iter()
+            .find(|change| change.path == selected.path)
+            .cloned()
+        else {
+            return;
+        };
+        self.dialog = Some(Dialog::Discard {
+            changes: vec![change],
+        });
     }
 
     fn change_section(
@@ -1785,13 +1830,23 @@ impl RepoTab {
     }
 
     fn change_row(&mut self, ui: &mut Ui, change: &FileChange, area: Area) {
-        let response = file_row(ui, change, self.change_selected(area, &change.path));
-        self.bind_change(response, change, area);
+        let row = file_row(
+            ui,
+            change,
+            self.change_selected(area, &change.path),
+            area == Area::Unstaged,
+        );
+        self.bind_change(row, change, area);
     }
 
     fn combined_row(&mut self, ui: &mut Ui, change: &FileChange, area: Area) {
-        let response = combined_file_row(ui, change, self.change_selected(area, &change.path));
-        self.bind_change(response, change, area);
+        let row = combined_file_row(
+            ui,
+            change,
+            self.change_selected(area, &change.path),
+            area == Area::Unstaged,
+        );
+        self.bind_change(row, change, area);
     }
 
     fn change_tree_file(
@@ -1802,14 +1857,15 @@ impl RepoTab {
         name: &str,
         depth: usize,
     ) {
-        let response = tree_file_row(
+        let row = tree_file_row(
             ui,
             change.kind,
             name,
             depth,
             self.change_selected(area, &change.path),
+            area == Area::Unstaged,
         );
-        self.bind_change(response, change, area);
+        self.bind_change(row, change, area);
     }
 
     fn change_selected(&self, area: Area, path: &str) -> bool {
@@ -1818,16 +1874,22 @@ impl RepoTab {
             .is_some_and(|selected| selected.area == area && selected.path == path)
     }
 
-    fn bind_change(&mut self, response: egui::Response, change: &FileChange, area: Area) {
+    fn bind_change(&mut self, row: ChangeRow, change: &FileChange, area: Area) {
+        let ChangeRow {
+            response,
+            over_discard,
+        } = row;
         let entry = SelectedChange {
             area,
             path: change.path.clone(),
             kind: change.kind,
+            old_path: change.old_path.clone(),
         };
         if response.clicked() {
             self.actions.push(Action::SelectChange(entry));
         }
-        if response.double_clicked() {
+        // 点在删除按钮上时不要双击暂存，否则确认放弃之前改动已经进了暂存区。
+        if response.double_clicked() && !over_discard {
             match area {
                 Area::Unstaged => self.actions.push(Action::Stage(vec![change.path.clone()])),
                 Area::Staged => self
@@ -1836,15 +1898,25 @@ impl RepoTab {
                 Area::Conflicted => {}
             }
         }
-        let response = response.on_hover_text(format!(
-            "{}{}",
-            widgets::change_name(change.kind),
-            change
-                .old_path
-                .as_ref()
-                .map(|old| tr!("，原路径 {old}", old = old))
-                .unwrap_or_default()
-        ));
+        if over_discard && response.clicked() {
+            self.dialog = Some(Dialog::Discard {
+                changes: vec![change.clone()],
+            });
+        }
+        let tip = if over_discard {
+            discard_tip(change.kind).to_string()
+        } else {
+            format!(
+                "{}{}",
+                widgets::change_name(change.kind),
+                change
+                    .old_path
+                    .as_ref()
+                    .map(|old| tr!("，原路径 {old}", old = old))
+                    .unwrap_or_default()
+            )
+        };
+        let response = response.on_hover_text(tip);
         response.context_menu(|ui| {
             match area {
                 Area::Unstaged => {
@@ -2000,7 +2072,7 @@ impl RepoTab {
             self.dialog = Some(Dialog::Discard {
                 changes: vec![FileChange {
                     path: selected.path.clone(),
-                    old_path: None,
+                    old_path: selected.old_path.clone(),
                     kind: selected.kind,
                 }],
             });
@@ -2716,7 +2788,7 @@ fn listed_changes<'a>(
         .collect()
 }
 
-fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response {
+fn file_row(ui: &mut Ui, change: &FileChange, selected: bool, discardable: bool) -> ChangeRow {
     let width = ui.available_width();
     let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 20.0), Sense::click());
     let visuals = ui.visuals();
@@ -2727,6 +2799,8 @@ fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response 
         ui.painter()
             .rect_filled(rect, 2.0, visuals.widgets.hovered.weak_bg_fill);
     }
+    let show_discard = discardable && response.hovered();
+    let text_rect = row_text_rect(rect, show_discard);
     let badge = Rect::from_min_size(rect.min + Vec2::new(2.0, 0.0), Vec2::new(18.0, 20.0));
     widgets::paint_change_badge(ui, badge, change.kind);
     let (dir, file) = match change.path.rsplit_once('/') {
@@ -2738,7 +2812,7 @@ fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response 
     } else {
         visuals.text_color()
     };
-    let painter = ui.painter().with_clip_rect(rect);
+    let painter = ui.painter().with_clip_rect(text_rect);
     let galley = painter.layout_no_wrap(file.to_string(), FontId::proportional(13.0), text_color);
     let name_pos = Pos2::new(badge.right() + 6.0, rect.center().y - galley.size().y / 2.0);
     let name_right = name_pos.x + galley.size().x;
@@ -2752,24 +2826,36 @@ fn file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response 
             visuals.weak_text_color(),
         );
     }
-    response
+    ChangeRow {
+        over_discard: paint_discard_button(ui, rect, &response, show_discard, selected),
+        response,
+    }
 }
 
 /// 合并列表：整条相对路径画在一行里。
-fn combined_file_row(ui: &mut Ui, change: &FileChange, selected: bool) -> egui::Response {
+fn combined_file_row(
+    ui: &mut Ui,
+    change: &FileChange,
+    selected: bool,
+    discardable: bool,
+) -> ChangeRow {
     let width = ui.available_width();
     let (rect, response) = ui.allocate_exact_size(Vec2::new(width, 20.0), Sense::click());
     paint_change_row_background(ui, rect, &response, selected);
+    let show_discard = discardable && response.hovered();
     let badge = Rect::from_min_size(rect.min + Vec2::new(2.0, 0.0), Vec2::new(18.0, 20.0));
     widgets::paint_change_badge(ui, badge, change.kind);
     paint_change_label(
         ui,
-        rect,
+        row_text_rect(rect, show_discard),
         badge.right() + 6.0,
         &change.path,
         change_row_text_color(ui, selected),
     );
-    response
+    ChangeRow {
+        over_discard: paint_discard_button(ui, rect, &response, show_discard, selected),
+        response,
+    }
 }
 
 fn change_folder_row(ui: &mut Ui, name: &str, depth: usize, open: bool) -> egui::Response {
@@ -2807,23 +2893,70 @@ fn tree_file_row(
     name: &str,
     depth: usize,
     selected: bool,
-) -> egui::Response {
+    discardable: bool,
+) -> ChangeRow {
     let width = ui.available_width();
     let (rect, response) =
         ui.allocate_exact_size(Vec2::new(width, CHANGES_TREE_ROW), Sense::click());
     paint_change_row_background(ui, rect, &response, selected);
+    let show_discard = discardable && response.hovered();
     // 文件徽标和同级目录图标对齐，前面留出箭头的位置。
     let x = rect.left() + 4.0 + depth as f32 * CHANGES_TREE_INDENT + 14.0;
     let badge = Rect::from_min_size(Pos2::new(x, rect.center().y - 10.0), Vec2::new(18.0, 20.0));
     widgets::paint_change_badge(ui, badge, kind);
     paint_change_label(
         ui,
-        rect,
+        row_text_rect(rect, show_discard),
         badge.right() + 6.0,
         name,
         change_row_text_color(ui, selected),
     );
-    response
+    ChangeRow {
+        over_discard: paint_discard_button(ui, rect, &response, show_discard, selected),
+        response,
+    }
+}
+
+fn row_text_rect(rect: Rect, show_discard: bool) -> Rect {
+    if show_discard {
+        rect.with_max_x(rect.right() - DISCARD_SLOT)
+    } else {
+        rect
+    }
+}
+
+/// 未暂存行右侧的还原按钮。悬停时出现，放弃改动；未跟踪文件则删除。
+fn paint_discard_button(
+    ui: &Ui,
+    rect: Rect,
+    response: &egui::Response,
+    show: bool,
+    selected: bool,
+) -> bool {
+    if !show {
+        return false;
+    }
+    let width = DISCARD_SLOT.min(rect.width());
+    let slot = Rect::from_min_size(
+        Pos2::new(rect.right() - width, rect.top()),
+        Vec2::new(width, rect.height()),
+    );
+    let over = response.hover_pos().is_some_and(|pos| slot.contains(pos));
+    let color = if selected {
+        ui.visuals().selection.stroke.color
+    } else {
+        ui.visuals().text_color()
+    };
+    icons::paint(ui.painter(), slot.center(), 13.0, Icon::Revert, color);
+    over
+}
+
+fn discard_tip(kind: ChangeKind) -> &'static str {
+    if kind == ChangeKind::Untracked {
+        tr!("删除此文件")
+    } else {
+        tr!("放弃此文件的更改")
+    }
 }
 
 fn paint_change_row_background(ui: &Ui, rect: Rect, response: &egui::Response, selected: bool) {
@@ -2863,15 +2996,17 @@ fn stash_top(root: &Path) -> Option<String> {
         .filter(|id| !id.is_empty())
 }
 
-/// `--autostash` 的任务结束后，栈顶多出一个名为 autostash 的贮藏，说明重新应用时冲突了。
-/// 应用成功时 git 会自己丢掉这个贮藏。
+/// 贮藏后重新应用发生冲突时，git 不会丢掉这个贮藏。
+/// 应用成功时贮藏会消失，栈顶回到任务开始前的样子。
 fn autostash_conflicted(root: &Path, before: &Option<String>) -> bool {
     let after = stash_top(root);
     if after.is_none() || after == *before {
         return false;
     }
-    git_output(root, &["stash", "list", "-1", "--format=%gs"])
-        .is_ok_and(|subject| subject.trim() == "autostash")
+    git_output(root, &["stash", "list", "-1", "--format=%gs"]).is_ok_and(|subject| {
+        let subject = subject.trim();
+        subject == "autostash" || subject.contains(PULL_STASH_MESSAGE)
+    })
 }
 
 #[derive(Clone)]

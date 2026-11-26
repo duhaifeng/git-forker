@@ -88,6 +88,7 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 删除分支 {name}	刪除分支 {name}	Delete branch {name}	ブランチ {name} を削除
 删除标签	刪除標籤	Delete Tag	タグを削除
 删除标签 {name}	刪除標籤 {name}	Delete tag {name}	タグ {name} を削除
+删除此文件	刪除此檔案	Delete This File	このファイルを削除
 删除贮藏	刪除儲藏	Delete Stash	スタッシュを削除
 删除贮藏 {stash}	刪除儲藏 {stash}	Delete stash {stash}	スタッシュ {stash} を削除
 删除远程仓库	刪除遠端儲存庫	Delete Remote	リモートを削除
@@ -250,6 +251,7 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 放弃更改	放棄變更	Discard Changes	変更を破棄
 放弃更改…	放棄變更…	Discard Changes…	変更を破棄…
 放弃此文件夹的更改…	放棄此資料夾的變更…	Discard Changes in This Folder…	このフォルダの変更を破棄…
+放弃此文件的更改	放棄此檔案的變更	Discard Changes to This File	このファイルの変更を破棄
 整理仓库	整理儲存庫	Clean Up Repository	リポジトリを整理
 整理仓库 (git gc)	整理儲存庫 (git gc)	Clean up repository (git gc)	リポジトリを整理 (git gc)
 文件	檔案	File	ファイル
@@ -401,6 +403,7 @@ git-forker: 切换前自动贮藏	git-forker: 切換前自動儲藏	git-forker: 
 贮藏	儲藏	Stash	スタッシュ
 贮藏后重新应用	儲藏後重新套用	Stash and reapply	スタッシュして再適用
 贮藏并重新应用本地更改 (--autostash)	儲藏並重新套用本機變更 (--autostash)	Stash and reapply local changes (--autostash)	ローカルの変更をスタッシュして再適用 (--autostash)
+挡住更新时贮藏并重新应用	擋住更新時儲藏並重新套用	Stash and reapply only when the update is blocked	更新が阻まれたときだけスタッシュして再適用
 贮藏更改	儲藏變更	Stash Changes	変更をスタッシュ
 贮藏更改…	儲藏變更…	Stash Changes…	変更をスタッシュ…
 起点: {start_label}	起點: {start_label}	Starting at: {start_label}	起点: {start_label}
@@ -481,8 +484,9 @@ Git 程序	Git 程式	Git Program	Git プログラム
 保留已暂存的文件	保留已暫存的檔案	Keep staged files	ステージ済みのファイルを残す
 先暂存要提交的文件	先暫存要提交的檔案	Stage files to commit first	先にコミットするファイルをステージしてください
 请先解决冲突	請先解決衝突	Resolve the conflicts first	先にコンフリクトを解決してください
-本地有 {count} 个未提交的更改，拉取时会先贮藏再重新应用。与远端的修改重叠时会产生冲突，改动会留在贮藏里。	本地有 {count} 個未提交的變更，拉取時會先暫存再重新套用。與遠端的修改重疊時會產生衝突，變更會留在暫存中。	You have {count} uncommitted changes. They are stashed before the pull and reapplied afterwards. If they overlap with remote changes, the reapply conflicts and your changes stay in the stash.	未コミットの変更が {count} 件あります。プル前にスタッシュし、プル後に再適用します。リモートの変更と重なると競合し、変更はスタッシュに残ります。
 本地有 {count} 个未提交的更改。与远端的修改重叠时拉取会失败，请先提交或贮藏。	本地有 {count} 個未提交的變更。與遠端的修改重疊時拉取會失敗，請先提交或暫存。	You have {count} uncommitted changes. If they overlap with remote changes, the pull fails. Commit or stash them first.	未コミットの変更が {count} 件あります。リモートの変更と重なるとプルは失敗します。先にコミットまたはスタッシュしてください。
+本地有 {count} 个未提交的更改。会先直接拉取，暂存状态保持不变。只有这些更改挡住更新时才先贮藏，再按原来的暂存状态重新应用。重新应用发生冲突时，改动会留在贮藏里。	本地有 {count} 個未提交的變更。會先直接拉取，暫存狀態保持不變。只有這些變更擋住更新時才先儲藏，再按原來的暫存狀態重新套用。重新套用發生衝突時，變更會留在儲藏裡。	You have {count} uncommitted changes. The pull runs first and leaves the index unchanged. Changes are stashed only if they block the update, then reapplied with their original staged state. If reapplying conflicts, your changes stay in the stash.	未コミットの変更が {count} 件あります。まずそのままプルし、インデックスは変えません。変更が更新を阻むときだけスタッシュし、元のステージ状態で再適用します。再適用で競合すると、変更はスタッシュに残ります。
+本地更改挡住了更新，先贮藏再重新应用。	本機變更擋住了更新，先儲藏再重新套用。	Local changes are blocking the update. Stashing them, then reapplying.	ローカルの変更が更新を阻んでいます。先にスタッシュして再適用します。
 {title}完成，但重新应用本地更改时有冲突，你的改动还在贮藏中	{title}完成，但重新套用本地變更時有衝突，你的變更還在暫存中	{title} finished, but reapplying your local changes conflicted. Your changes are still in the stash	{title}は完了しましたが、ローカルの変更の再適用で競合しました。変更はスタッシュに残っています
 着色	著色	Coloring	色分け
 语法着色	語法著色	Syntax	構文色

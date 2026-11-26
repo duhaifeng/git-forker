@@ -116,13 +116,21 @@ impl<'a> Row<'a> {
             x += 14.0;
         }
         if let Some(icon) = self.icon {
-            icons::paint(
-                ui.painter(),
-                pos2(x + icons::INLINE / 2.0, center_y),
-                icons::INLINE,
-                icon,
-                self.icon_color.unwrap_or(weak),
-            );
+            if icon == Icon::Folder {
+                icons::paint_folder(
+                    ui.painter(),
+                    pos2(x + 7.0, center_y),
+                    self.chevron.unwrap_or(false),
+                );
+            } else {
+                icons::paint(
+                    ui.painter(),
+                    pos2(x + icons::INLINE / 2.0, center_y),
+                    icons::INLINE,
+                    icon,
+                    self.icon_color.unwrap_or(weak),
+                );
+            }
             x += 22.0;
         }
         let font = FontId::proportional(13.5);

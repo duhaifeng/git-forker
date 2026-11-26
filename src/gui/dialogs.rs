@@ -317,11 +317,11 @@ impl Dialog {
                     combo(ui, "pull-branch", branch, &branches)
                 });
                 ui.checkbox(rebase, tr!("用变基代替合并 (--rebase)"));
-                ui.checkbox(autostash, tr!("贮藏并重新应用本地更改 (--autostash)"));
+                ui.checkbox(autostash, tr!("挡住更新时贮藏并重新应用"));
                 if env.local_changes > 0 {
                     let text = if *autostash {
                         tr!(
-                            "本地有 {count} 个未提交的更改，拉取时会先贮藏再重新应用。与远端的修改重叠时会产生冲突，改动会留在贮藏里。",
+                            "本地有 {count} 个未提交的更改。会先直接拉取，暂存状态保持不变。只有这些更改挡住更新时才先贮藏，再按原来的暂存状态重新应用。重新应用发生冲突时，改动会留在贮藏里。",
                             count = env.local_changes
                         )
                     } else {
@@ -718,16 +718,18 @@ impl Dialog {
             } => {
                 let mut args = vec!["pull".to_string(), "--progress".into()];
                 args.push(if *rebase { "--rebase" } else { "--no-rebase" }.into());
-                if *autostash {
-                    args.push("--autostash".into());
-                }
                 args.extend([remote.clone(), branch.clone()]);
-                job(tr!(
+                let job = job(tr!(
                     "从 {remote}/{branch} 拉取",
                     remote = remote,
                     branch = branch
                 ))
-                .step(args)
+                .step(args);
+                if *autostash {
+                    job.stash_if_blocked()
+                } else {
+                    job
+                }
             }
             Dialog::Push {
                 local,
@@ -1361,6 +1363,21 @@ mod tests {
                 "origin",
                 "refs/heads/main:refs/heads/release"
             ]]
+        );
+    }
+
+    #[test]
+    fn pull_does_not_pass_autostash_and_restores_the_index_itself() {
+        let job = job_of(Dialog::Pull {
+            remote: "origin".into(),
+            branch: "main".into(),
+            rebase: false,
+            autostash: true,
+        });
+        assert!(job.stash_if_blocked);
+        assert_eq!(
+            job.steps,
+            vec![vec!["pull", "--progress", "--no-rebase", "origin", "main"]]
         );
     }
 
